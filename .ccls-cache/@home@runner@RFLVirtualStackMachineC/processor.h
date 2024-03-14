@@ -27,6 +27,8 @@ void execute(Processor *processor, int opcode, int operand);
 
 Processor *create_processor(int memory_size, int stack_size);
 
+void run(Processor *processor, int *program, int program_size, bool debug);
+
 // Instruction structure
 typedef struct {
   char *name;

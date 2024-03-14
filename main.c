@@ -54,22 +54,23 @@ int main_isa() {
 int main_processor() {
   Processor *processor = create_processor(32, 32);
   // blink led
-  // int program[9] = {131073, 393216, 196608, 328680, 131072,
+  // int program_size = 9;
+  // int program[] = {131073, 393216, 196608, 328680, 131072,
   //                 393216, 328680, 196608, 262144};
 
   // for
-  const int program_size = 13;
-  int program[program_size] = {131072, 196608, 131082, 196609, 131073,
-                               196610, 65536,  393216, 65538,  458752,
-                               786433, 0,      262151};
-  // inc_dec
-  // const int program_size = 19;
-  // int program[program_size] = {131072, 196608, 131082, 196609, 131072,
-  //                              393216, 262151, 131073, 458752, 393216,
-  //                              983041, 262151, 262157, 131073, 524288,
-  //                              393216, 917504, 262157, 0};
+  int program_size = 15;
+  int program[] = {131072, 196608, 131082,  196609, 131073,
+                   196610, 65536,  1048589, 65538,  458752,
+                   786433, 0,      262151,  393216, 1114112};
 
-  run(processor, program, program_size, false);
+  // inc_dec
+  // int program_size = 19;
+  // int program[] = {131072, 196608, 131082, 196609, 131072, 393216, 262151,
+  //                  131073, 458752, 393216, 983041, 262151, 262157, 131073,
+  //                  524288, 393216, 917504, 262157, 0};
+
+  run(processor, program, program_size, true);
   return 0;
 }
 
