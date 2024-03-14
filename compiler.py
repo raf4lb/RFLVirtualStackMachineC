@@ -1,11 +1,24 @@
+import sys
+
 INSTRUCTIONS = {
-    'HTL': 0,
+    'HLT': 0,
     'PSH': 1,
     'PSHL': 2,
     'POP': 3,
     'JMP': 4,
     'DLY': 5,
     'TOP': 6,
+    'ADD': 7,
+    'SUB': 8,
+    'MUL': 9,
+    'DIV': 10,
+    'JE': 11,
+    'JL': 12,
+    'JG': 13,
+    'JLE': 14,
+    'JGE': 15,
+    'CALL': 16,
+    'RET': 17,
 }
 
 
@@ -88,7 +101,14 @@ def compile_rfl(filename: str, debug=False) -> list[int]:
                 print(f"{dline}\t", instruction)
                 dline += 1
             opcode = bin(INSTRUCTIONS[instruction[0]])[2:]
-            operand = bin(int(instruction[1]))[2:] if len(instruction) == 2 else '0'
+            operand = bin(int(
+                instruction[1]))[2:] if len(instruction) == 2 else '0'
             operand = operand.zfill(16)
             program.append(int(f"{opcode}{operand}", 2))
     return program
+
+
+if __name__ == '__main__':
+    program = compile_rfl(sys.argv[1])
+    program_len = len(program)
+    print(program, program_len)

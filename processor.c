@@ -302,6 +302,7 @@ void processor_set_address(Processor *processor, int address, int value) {
 
 void run(Processor *processor, int *program, int program_size, bool debug) {
   processor->memory.size = program_size;
+  processor->user_memory = program_size;
   processor->memory.data = program;
   processor->debug = debug;
 
@@ -342,6 +343,7 @@ Processor *create_processor(int memory_size, int stack_size) {
   processor->call_stack = &call_stack;
   processor->pc = 0;        // Initialize program counter
   processor->debug = false; // Assuming debug is disabled by default
+  processor->user_memory = 0;
 
   return processor;
 }
