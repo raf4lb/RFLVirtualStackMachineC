@@ -1,0 +1,30 @@
+; For example
+; int i
+; int max = 10
+; for i = 0; i < max; i++
+;   print i
+
+VAR i
+VAR max
+VAR inc
+
+.main
+  PSHL 0
+  POP $i
+  PSHL 10
+  POP $max
+  PSHL 1
+  POP $inc
+  PSH $i
+
+.for
+  CALL .print
+  PSH $inc
+  ADD
+  JL $max
+  HLT
+  JMP .for
+
+.print
+  TOP
+  RET

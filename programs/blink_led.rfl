@@ -1,0 +1,13 @@
+; blink led simulation example
+; turn ON, wait 1s, turn OFF, wait 1s
+
+.loop
+    PSHL 1
+    TOP
+    POP 0
+    DLY 1000
+    PSHL 0
+    TOP
+    DLY 1000
+    POP 0
+    JMP .loop
