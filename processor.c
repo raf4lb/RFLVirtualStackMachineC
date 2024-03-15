@@ -5,14 +5,48 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-int OPCODE_HALT = 0;
-int OPCODE_JUMP = 4;
-int OPCODE_CALL = 16;
+const int OPCODE_HALT = 0;
+const int OPCODE_PUSH = 1;
+const int OPCODE_PUSH_LITERAL = 2;
+const int OPCODE_POP = 3;
+const int OPCODE_DELAY = 4;
+const int OPCODE_TOP = 5;
+const int OPCODE_ADD = 6;
+const int OPCODE_SUBTRACT = 7;
+const int OPCODE_MULTIPLY = 8;
+const int OPCODE_DIVIDE = 9;
+const int OPCODE_JUMP = 10;
+const int OPCODE_JUMP_EQUAL = 11;
+const int OPCODE_JUMP_LESS = 12;
+const int OPCODE_JUMP_GREATER = 13;
+const int OPCODE_JUMP_LESS_EQUAL = 14;
+const int OPCODE_JUMP_GREATER_EQUAL = 15;
+const int OPCODE_CALL = 16;
+const int OPCODE_RET = 17;
+
+const char *NAME_HALT = "HLT";
+const char *NAME_PUSH = "PSH";
+const char *NAME_PUSH_LITERAL = "PSHL";
+const char *NAME_POP = "POP";
+const char *NAME_DELAY = "DLY";
+const char *NAME_TOP = "TOP";
+const char *NAME_ADD = "ADD";
+const char *NAME_SUBTRACT = "SUB";
+const char *NAME_MULTIPLY = "MUL";
+const char *NAME_DIVIDE = "DIV";
+const char *NAME_JUMP = "JMP";
+const char *NAME_JUMP_EQUAL = "JE";
+const char *NAME_JUMP_LESS = "JL";
+const char *NAME_JUMP_GREATER = "JG";
+const char *NAME_JUMP_LESS_EQUAL = "JLE";
+const char *NAME_JUMP_GREATER_EQUAL = "JGE";
+const char *NAME_CALL = "CALL";
+const char *NAME_RET = "RET";
 
 void HaltInstruction_execute(Processor *processor, int operand) { exit(0); }
 
 void PushInstruction_execute(Processor *processor, int address) {
-  stack_push(processor->stack, processor->stack->memory.data[address]);
+  stack_push(processor->stack, processor_get_address(processor, address));
 }
 
 void PushLiteralInstruction_execute(Processor *processor, int value) {
@@ -22,6 +56,15 @@ void PushLiteralInstruction_execute(Processor *processor, int value) {
 void PopInstruction_execute(Processor *processor, int address) {
   int value = stack_pop(processor->stack);
   processor_set_address(processor, address, value);
+}
+
+void DelayInstruction_execute(Processor *processor, int value) {
+  int microseconds = value * 1000;
+  usleep(microseconds);
+}
+
+void TopInstruction_execute(Processor *processor, int operand) {
+  printf("%d\n", stack_get_top(processor->stack));
 }
 
 void AddInstruction_execute(Processor *processor, int operand) {
@@ -46,10 +89,6 @@ void DivideInstruction_execute(Processor *processor, int operand) {
   int b = stack_pop(processor->stack);
   int a = stack_pop(processor->stack);
   stack_push(processor->stack, divide(a, b));
-}
-
-void TopInstruction_execute(Processor *processor, int operand) {
-  printf("%d\n", stack_get_top(processor->stack));
 }
 
 void JumpInstruction_execute(Processor *processor, int address) {
@@ -91,11 +130,6 @@ void JumpGreaterEqualInstruction_execute(Processor *processor, int address) {
   }
 }
 
-void DelayInstruction_execute(Processor *processor, int value) {
-  int microseconds = value * 1000;
-  usleep(microseconds);
-}
-
 void CallInstruction_execute(Processor *processor, int address) {
   stack_push(processor->call_stack, processor->pc);
   processor->pc = address;
@@ -108,173 +142,173 @@ void ReturnInstruction_execute(Processor *processor, int operand) {
 
 Instruction create_HaltInstruction() {
   Instruction instruction;
-  instruction.name = "HLT";
-  instruction.opcode = 0;
+  instruction.name = NAME_HALT;
+  instruction.opcode = OPCODE_HALT;
   instruction.execute = HaltInstruction_execute;
   return instruction;
 }
 
 Instruction create_PushInstruction() {
   Instruction instruction;
-  instruction.name = "PSH";
-  instruction.opcode = 1;
+  instruction.name = NAME_PUSH;
+  instruction.opcode = OPCODE_PUSH;
   instruction.execute = PushInstruction_execute;
   return instruction;
 }
 
 Instruction create_PushLiteralInstruction() {
   Instruction instruction;
-  instruction.name = "PSHL";
-  instruction.opcode = 2;
+  instruction.name = NAME_PUSH_LITERAL;
+  instruction.opcode = OPCODE_PUSH_LITERAL;
   instruction.execute = PushLiteralInstruction_execute;
   return instruction;
 }
 
 Instruction create_PopInstruction() {
   Instruction instruction;
-  instruction.name = "POP";
-  instruction.opcode = 3;
+  instruction.name = NAME_POP;
+  instruction.opcode = OPCODE_POP;
   instruction.execute = PopInstruction_execute;
-  return instruction;
-}
-
-Instruction create_JumpInstruction() {
-  Instruction instruction;
-  instruction.name = "JMP";
-  instruction.opcode = 4;
-  instruction.execute = JumpInstruction_execute;
   return instruction;
 }
 
 Instruction create_DelayInstruction() {
   Instruction instruction;
-  instruction.name = "DLY";
-  instruction.opcode = 5;
+  instruction.name = NAME_DELAY;
+  instruction.opcode = OPCODE_DELAY;
   instruction.execute = DelayInstruction_execute;
   return instruction;
 }
 
 Instruction create_TopInstruction() {
   Instruction instruction;
-  instruction.name = "TOP";
-  instruction.opcode = 6;
+  instruction.name = NAME_TOP;
+  instruction.opcode = OPCODE_TOP;
   instruction.execute = TopInstruction_execute;
   return instruction;
 }
 
 Instruction create_AddInstruction() {
   Instruction instruction;
-  instruction.name = "ADD";
-  instruction.opcode = 7;
+  instruction.name = NAME_ADD;
+  instruction.opcode = OPCODE_ADD;
   instruction.execute = AddInstruction_execute;
   return instruction;
 }
 
 Instruction create_SubtractInstruction() {
   Instruction instruction;
-  instruction.name = "SUB";
-  instruction.opcode = 8;
+  instruction.name = NAME_SUBTRACT;
+  instruction.opcode = OPCODE_SUBTRACT;
   instruction.execute = SubtractInstruction_execute;
   return instruction;
 }
 
 Instruction create_MultiplyInstruction() {
   Instruction instruction;
-  instruction.name = "MUL";
-  instruction.opcode = 9;
+  instruction.name = NAME_MULTIPLY;
+  instruction.opcode = OPCODE_MULTIPLY;
   instruction.execute = MultiplyInstruction_execute;
   return instruction;
 }
 
 Instruction create_DivideInstruction() {
   Instruction instruction;
-  instruction.name = "DIV";
-  instruction.opcode = 10;
+  instruction.name = NAME_DIVIDE;
+  instruction.opcode = OPCODE_DIVIDE;
   instruction.execute = DivideInstruction_execute;
+  return instruction;
+}
+
+Instruction create_JumpInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_JUMP;
+  instruction.opcode = OPCODE_JUMP;
+  instruction.execute = JumpInstruction_execute;
   return instruction;
 }
 
 Instruction create_JumpEqualInstruction() {
   Instruction instruction;
-  instruction.name = "JE";
-  instruction.opcode = 11;
+  instruction.name = NAME_JUMP_EQUAL;
+  instruction.opcode = OPCODE_JUMP_EQUAL;
   instruction.execute = JumpEqualInstruction_execute;
   return instruction;
 }
 
 Instruction create_JumpLessInstruction() {
   Instruction instruction;
-  instruction.name = "JL";
-  instruction.opcode = 12;
+  instruction.name = NAME_JUMP_LESS;
+  instruction.opcode = OPCODE_JUMP_LESS;
   instruction.execute = JumpLessInstruction_execute;
   return instruction;
 }
 
 Instruction create_JumpGreaterInstruction() {
   Instruction instruction;
-  instruction.name = "JG";
-  instruction.opcode = 13;
+  instruction.name = NAME_JUMP_GREATER;
+  instruction.opcode = OPCODE_JUMP_GREATER;
   instruction.execute = JumpGreaterInstruction_execute;
   return instruction;
 }
 
 Instruction create_JumpLessEqualInstruction() {
   Instruction instruction;
-  instruction.name = "JLE";
-  instruction.opcode = 14;
+  instruction.name = NAME_JUMP_LESS_EQUAL;
+  instruction.opcode = OPCODE_JUMP_LESS_EQUAL;
   instruction.execute = JumpLessEqualInstruction_execute;
   return instruction;
 }
 
 Instruction create_JumpGreaterEqualInstruction() {
   Instruction instruction;
-  instruction.name = "JGE";
-  instruction.opcode = 15;
+  instruction.name = NAME_JUMP_GREATER_EQUAL;
+  instruction.opcode = OPCODE_JUMP_GREATER_EQUAL;
   instruction.execute = JumpGreaterEqualInstruction_execute;
   return instruction;
 }
 
 Instruction create_CallInstruction() {
   Instruction instruction;
-  instruction.name = "CALL";
-  instruction.opcode = 16;
+  instruction.name = NAME_CALL;
+  instruction.opcode = OPCODE_CALL;
   instruction.execute = CallInstruction_execute;
   return instruction;
 }
 
 Instruction create_ReturnInstruction() {
   Instruction instruction;
-  instruction.name = "RET";
-  instruction.opcode = 17;
+  instruction.name = NAME_RET;
+  instruction.opcode = OPCODE_RET;
   instruction.execute = ReturnInstruction_execute;
   return instruction;
 }
 
 Instruction *create_ISA() {
   static Instruction isa[18];
-  isa[0] = create_HaltInstruction();
-  isa[1] = create_PushInstruction();
-  isa[2] = create_PushLiteralInstruction();
-  isa[3] = create_PopInstruction();
-  isa[4] = create_JumpInstruction();
-  isa[5] = create_DelayInstruction();
-  isa[6] = create_TopInstruction();
-  isa[7] = create_AddInstruction();
-  isa[8] = create_SubtractInstruction();
-  isa[9] = create_MultiplyInstruction();
-  isa[10] = create_DivideInstruction();
-  isa[11] = create_JumpEqualInstruction();
-  isa[12] = create_JumpLessInstruction();
-  isa[13] = create_JumpGreaterInstruction();
-  isa[14] = create_JumpLessEqualInstruction();
-  isa[15] = create_JumpGreaterEqualInstruction();
-  isa[16] = create_CallInstruction();
-  isa[17] = create_ReturnInstruction();
+  isa[OPCODE_HALT] = create_HaltInstruction();
+  isa[OPCODE_PUSH] = create_PushInstruction();
+  isa[OPCODE_PUSH_LITERAL] = create_PushLiteralInstruction();
+  isa[OPCODE_POP] = create_PopInstruction();
+  isa[OPCODE_DELAY] = create_DelayInstruction();
+  isa[OPCODE_TOP] = create_TopInstruction();
+  isa[OPCODE_ADD] = create_AddInstruction();
+  isa[OPCODE_SUBTRACT] = create_SubtractInstruction();
+  isa[OPCODE_MULTIPLY] = create_MultiplyInstruction();
+  isa[OPCODE_DIVIDE] = create_DivideInstruction();
+  isa[OPCODE_JUMP] = create_JumpInstruction();
+  isa[OPCODE_JUMP_EQUAL] = create_JumpEqualInstruction();
+  isa[OPCODE_JUMP_LESS] = create_JumpLessInstruction();
+  isa[OPCODE_JUMP_GREATER] = create_JumpGreaterInstruction();
+  isa[OPCODE_JUMP_LESS_EQUAL] = create_JumpLessEqualInstruction();
+  isa[OPCODE_JUMP_GREATER_EQUAL] = create_JumpGreaterEqualInstruction();
+  isa[OPCODE_CALL] = create_CallInstruction();
+  isa[OPCODE_RET] = create_ReturnInstruction();
   return isa;
 }
 
 int fetch(Processor *processor) {
-  return processor->memory.data[processor->pc];
+  return processor->memory->data[processor->pc];
 }
 
 DecodedInstruction decode(int instruction) {
@@ -293,17 +327,20 @@ void execute(Processor *processor, int opcode, int operand) {
 }
 
 int processor_get_address(Processor *processor, int address) {
-  return processor->memory.data[processor->user_memory + address];
+  return processor->memory->data[processor->user_memory + address];
 }
 
 void processor_set_address(Processor *processor, int address, int value) {
-  processor->memory.data[processor->user_memory + address] = value;
+  processor->memory->data[processor->user_memory + address] = value;
 }
 
 void run(Processor *processor, int *program, int program_size, bool debug) {
-  processor->memory.size = program_size;
+  processor->memory->size = program_size;
   processor->user_memory = program_size;
-  processor->memory.data = program;
+  for (int i = 0; i < program_size; i++) {
+    processor->memory->data[i] = program[i];
+  }
+
   processor->debug = debug;
 
   if (debug) {
@@ -332,15 +369,16 @@ Processor *create_processor(int memory_size, int stack_size) {
   }
 
   // Allocate memory for memory structure and initialize its data
-  processor->memory = create_memory(memory_size);
+  Memory *memory = create_memory(memory_size);
+  processor->memory = memory;
 
   // Allocate memory for stack structure and initialize its data
-  Stack stack = create_stack(stack_size);
-  processor->stack = &stack;
+  Stack *stack = create_stack(stack_size);
+  processor->stack = stack;
 
   // Allocate memory for call stack structure and initialize its data
-  Stack call_stack = create_stack(stack_size);
-  processor->call_stack = &call_stack;
+  Stack *call_stack = create_stack(stack_size);
+  processor->call_stack = call_stack;
   processor->pc = 0;        // Initialize program counter
   processor->debug = false; // Assuming debug is disabled by default
   processor->user_memory = 0;
