@@ -4,23 +4,23 @@
 #include <stdlib.h>
 
 int main_stack() {
-  Stack stack = create_stack(10);
+  Stack *stack = create_stack(10);
 
-  stack_push(&stack, 5);
-  stack_push(&stack, 10);
-  stack_push(&stack, 15);
+  stack_push(stack, 5);
+  stack_push(stack, 10);
+  stack_push(stack, 15);
 
-  stack_pprint(&stack);
+  stack_pprint(stack);
 
-  int top = stack_get_top(&stack);
+  int top = stack_get_top(stack);
   printf("Top element: %d\n", top);
 
-  int popped = stack_pop(&stack);
+  int popped = stack_pop(stack);
   printf("Popped element: %d\n", popped);
 
-  stack_pprint(&stack);
+  stack_pprint(stack);
 
-  destroy_memory(&stack.memory);
+  destroy_memory(stack->memory);
 
   return 0;
 }
@@ -54,9 +54,9 @@ int main_isa() {
 int main_processor() {
   Processor *processor = create_processor(32, 32);
   // blink led
-  // int program_size = 9;
-  // int program[] = {131073, 393216, 196608, 328680, 131072, 393216, 328680,
-  // 196608, 262144};
+  int program_size = 9;
+  int program[] = {131073, 327680, 196608, 263144, 131072,
+                   327680, 263144, 196608, 655360};
 
   // for
   // int program_size = 15;
@@ -65,10 +65,10 @@ int main_processor() {
   //                  786433, 0,      262151,  393216, 1114112};
 
   // inc_dec
-  int program_size = 19;
-  int program[] = {131072, 196608, 131082, 196609, 131072, 393216, 262151,
-                   131073, 458752, 393216, 983041, 262151, 262157, 131073,
-                   524288, 393216, 917504, 262157, 0};
+  // int program_size = 19;
+  // int program[] = {131072, 196608, 131082, 196609, 131072, 393216, 262151,
+  //                  131073, 458752, 393216, 983041, 262151, 262157, 131073,
+  //                  524288, 393216, 917504, 262157, 0};
 
   run(processor, program, program_size, false);
   return 0;

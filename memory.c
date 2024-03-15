@@ -2,18 +2,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Memory create_memory(int size) {
-  Memory mem;
-  mem.size = size;
-  mem.data = (int *)malloc(size * sizeof(int));
-  if (mem.data == NULL) {
-    printf("Memory allocation failed.\n");
+Memory *create_memory(int size) {
+  Memory *memory = (Memory *)malloc(sizeof(Memory));
+  if (memory == NULL) {
+    fprintf(stderr, "Memory allocation failed for memory\n");
+    exit(1);
+  }
+  memory->size = size;
+  memory->data = (int *)malloc(size * sizeof(int));
+  if (memory->data == NULL) {
+    printf("Memory allocation failed for memory data.\n");
     exit(1);
   }
   for (int i = 0; i < size; i++) {
-    mem.data[i] = 0;
+    memory->data[i] = 0;
   }
-  return mem;
+  return memory;
 }
 
 void destroy_memory(Memory *mem) { free(mem->data); }

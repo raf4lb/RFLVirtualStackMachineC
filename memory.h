@@ -3,6 +3,6 @@ typedef struct {
   int *data;
 } Memory;
 
-Memory create_memory(int size);
+Memory *create_memory(int size);
 
-void destroy_memory(Memory *mem);
+void destroy_memory(Memory *memory);
