@@ -1,12 +1,18 @@
-#include "ALU.h"
 #include "processor.h"
 
 int main_processor() {
-  Processor *processor = create_processor(32, 32);
+
+  int memory_size = 32;
+  int stack_size = 32;
+  int total_ports = 2;
+
+  Processor *processor = create_processor(memory_size, stack_size, total_ports);
   // blink led
-  int program_size = 9;
-  long int program[] = {131073, 327680, 196608, 263144, 131072,
-                   327680, 263144, 196608, 655360};
+  int program_size = 23;
+  long int program[] = {131104,  196608,  1048587, 262644, 1048590, 262644,
+                        1048593, 262644,  1048596, 262644, 655362,  131120,
+                        196609,  1114112, 131112,  196609, 1114112, 131088,
+                        196609,  1114112, 131080,  196609, 1114112};
 
   run(processor, program, program_size, false);
   return 0;

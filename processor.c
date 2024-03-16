@@ -1,12 +1,12 @@
 #include "processor.h"
 #include "ALU.h"
+#include "delay.h"
+#include "io.h"
 #include <avr/io.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#define F_CPU 16000000UL
-#include <util/delay.h> // Delay functions
 
 int OPCODE_HALT = 0;
 int OPCODE_PUSH = 1;
@@ -60,14 +60,16 @@ void PopInstruction_execute(Processor *processor, int address) {
   processor_set_address(processor, address, value);
 }
 
-void blink_led() {}
-
-void DelayInstruction_execute(Processor *processor, int value) {
+void blink_led(int value) {
   DDRB = DDRB | (1 << DDB5);
   PORTB = PORTB | (1 << PORTB5);
-  _delay_ms(1000);
+  delay_ms(value);
   PORTB = PORTB & ~(1 << PORTB5);
-  _delay_ms(1000);
+  delay_ms(value);
+}
+
+void DelayInstruction_execute(Processor *processor, int value) {
+  delay_ms(value);
 }
 
 void TopInstruction_execute(Processor *processor, int operand) {
@@ -99,7 +101,7 @@ void DivideInstruction_execute(Processor *processor, int operand) {
 }
 
 void JumpInstruction_execute(Processor *processor, int address) {
-  processor->pc = address;
+  processor_set_pc(processor, address);
 }
 
 void JumpEqualInstruction_execute(Processor *processor, int address) {
@@ -139,7 +141,7 @@ void JumpGreaterEqualInstruction_execute(Processor *processor, int address) {
 
 void CallInstruction_execute(Processor *processor, int address) {
   stack_push(processor->call_stack, processor->pc);
-  processor->pc = address;
+  processor_set_pc(processor, address);
 }
 
 void ReturnInstruction_execute(Processor *processor, int operand) {
@@ -338,18 +340,31 @@ long int processor_get_address(Processor *processor, int address) {
 }
 
 void processor_set_address(Processor *processor, int address, int value) {
-  processor->memory->data[processor->user_memory + address] = value;
+  int offset;
+  if (address < processor->ports_memory) {
+    offset = processor->ports_memory;
+    set_port(address, value);
+  } else {
+    offset = processor->user_memory;
+  }
+  processor->memory->data[offset + address] = value;
+}
+
+void processor_set_pc(Processor *processor, int address) {
+  processor->pc = processor->ports_memory + address;
+}
+
+void load_program(Processor *processor, long int *program, int program_size) {
+  for (int i = 0; i < program_size; i++) {
+    processor->memory->data[processor->ports_memory + i] = program[i];
+  }
 }
 
 void run(Processor *processor, long int *program, int program_size,
          bool debug) {
-  processor->memory->size = program_size;
-  processor->user_memory = program_size;
-  for (int i = 0; i < program_size; i++) {
-    processor->memory->data[i] = program[i];
-  }
-
   processor->debug = debug;
+  processor->user_memory = processor->ports_memory + program_size;
+  load_program(processor, program, program_size);
 
   if (debug) {
     printf("Running instructions:\n");
@@ -369,7 +384,7 @@ void run(Processor *processor, long int *program, int program_size,
   }
 }
 
-Processor *create_processor(int memory_size, int stack_size) {
+Processor *create_processor(int memory_size, int stack_size, int total_ports) {
   Processor *processor = (Processor *)malloc(sizeof(Processor));
   if (processor == NULL) {
     fprintf(stderr, "Memory allocation failed for processor\n");
@@ -387,9 +402,12 @@ Processor *create_processor(int memory_size, int stack_size) {
   // Allocate memory for call stack structure and initialize its data
   Stack *call_stack = create_stack(stack_size);
   processor->call_stack = call_stack;
-  processor->pc = 0;        // Initialize program counter
   processor->debug = false; // Assuming debug is disabled by default
   processor->user_memory = 0;
-
+  processor->ports_memory = total_ports;
+  for (int i = 0; i < total_ports; i++) {
+    processor->memory->data[i] = 0; // Set all ports to 0
+  }
+  processor->pc = processor->ports_memory; // Initialize program counter
   return processor;
 }

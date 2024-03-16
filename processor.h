@@ -6,6 +6,7 @@ typedef struct {
   Stack *stack;
   Stack *call_stack;
   int pc;
+  int ports_memory;
   int user_memory;
   bool debug;
 } Processor;
@@ -21,11 +22,15 @@ DecodedInstruction decode(long int instruction);
 
 void execute(Processor *processor, int opcode, int operand);
 
-Processor *create_processor(int memory_size, int stack_size);
+Processor *create_processor(int memory_size, int stack_size, int total_ports);
 
 long int processor_get_address(Processor *processor, int address);
 
 void processor_set_address(Processor *processor, int address, int value);
+
+void processor_set_pc(Processor *processor, int address);
+
+void load_program(Processor *processor, long int *program, int program_size);
 
 void run(Processor *processor, long int *program, int program_size, bool debug);
 

@@ -1,13 +1,36 @@
-; blink led simulation example
-; turn ON, wait 1s, turn OFF, wait 1s
+; blink leds simulation example
+; https://wokwi.com/projects/392488113792645121
+
+PSHL 32 
+POP 0             ; set all DDRB output
 
 .loop
-    PSHL 1
-    TOP
-    POP 0
-    DLY 1000
-    PSHL 0
-    TOP
-    DLY 1000
-    POP 0
+    CALL .step1
+    DLY 500       
+    CALL .step2
+    DLY 500      
+    CALL .step3
+    DLY 500      
+    CALL .step4
+    DLY 500      
     JMP .loop
+
+.step1
+    PSHL 48       ; push 0b110000
+    POP 1         ; set PORTB 0b110000 
+    RET
+
+.step2
+    PSHL 40       ; push 0b101000
+    POP 1         ; set PORTB 0b101000
+    RET
+
+.step3
+    PSHL 16       ; push 0b010000
+    POP 1         ; set PORTB 0b010000
+    RET
+
+.step4
+    PSHL 8        ; push 0b001000
+    POP 1         ; set PORTB 0b001000
+    RET
