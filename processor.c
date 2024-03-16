@@ -60,14 +60,6 @@ void PopInstruction_execute(Processor *processor, int address) {
   processor_set_address(processor, address, value);
 }
 
-void blink_led(int value) {
-  DDRB = DDRB | (1 << DDB5);
-  PORTB = PORTB | (1 << PORTB5);
-  delay_ms(value);
-  PORTB = PORTB & ~(1 << PORTB5);
-  delay_ms(value);
-}
-
 void DelayInstruction_execute(Processor *processor, int value) {
   delay_ms(value);
 }
