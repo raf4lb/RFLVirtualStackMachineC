@@ -9,7 +9,7 @@ Memory *create_memory(int size) {
     exit(1);
   }
   memory->size = size;
-  memory->data = (int *)malloc(size * sizeof(int));
+  memory->data = (long int *)malloc(size * sizeof(long int));
   if (memory->data == NULL) {
     printf("Memory allocation failed for memory data.\n");
     exit(1);

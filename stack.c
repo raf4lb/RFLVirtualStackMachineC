@@ -18,9 +18,9 @@ void stack_pprint(Stack *stack) {
     if (i > 0)
       printf(", ");
     if (i == stack->sp - 1)
-      printf("->%d", stack->memory->data[i]);
+      printf("->%ld", stack->memory->data[i]);
     else
-      printf("%d", stack->memory->data[i]);
+      printf("%ld", stack->memory->data[i]);
   }
   printf("]\n");
 }

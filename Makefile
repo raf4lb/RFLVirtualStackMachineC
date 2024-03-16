@@ -12,5 +12,18 @@ main: $(SRCS) $(HEADERS)
 main-debug: $(SRCS) $(HEADERS)
 	$(CC) $(CFLAGS) -O0 $(SRCS) -o "$@"
 
+arduino:
+	mkdir build
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c ALU.c -o build/ALU.o
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c memory.c -o build/memory.o
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c stack.c -o build/stack.o
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c processor.c -o build/processor.o
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p -c main.c -o build/main.o
+	avr-gcc -Os -DF_CPU=16000000UL -mmcu=atmega328p build/ALU.o build/memory.o build/stack.o build/processor.o build/main.o -o build/main.bin
+	avr-objcopy -O ihex -R .eeprom build/main.bin build/main.hex
+
+clean-arduino:
+	rm -r build
+
 clean:
 	rm -f main main-debug

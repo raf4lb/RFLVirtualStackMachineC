@@ -1,47 +1,49 @@
 #include "processor.h"
 #include "ALU.h"
+#include <avr/io.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#define F_CPU 16000000UL
+#include <util/delay.h> // Delay functions
 
-const int OPCODE_HALT = 0;
-const int OPCODE_PUSH = 1;
-const int OPCODE_PUSH_LITERAL = 2;
-const int OPCODE_POP = 3;
-const int OPCODE_DELAY = 4;
-const int OPCODE_TOP = 5;
-const int OPCODE_ADD = 6;
-const int OPCODE_SUBTRACT = 7;
-const int OPCODE_MULTIPLY = 8;
-const int OPCODE_DIVIDE = 9;
-const int OPCODE_JUMP = 10;
-const int OPCODE_JUMP_EQUAL = 11;
-const int OPCODE_JUMP_LESS = 12;
-const int OPCODE_JUMP_GREATER = 13;
-const int OPCODE_JUMP_LESS_EQUAL = 14;
-const int OPCODE_JUMP_GREATER_EQUAL = 15;
-const int OPCODE_CALL = 16;
-const int OPCODE_RET = 17;
-
-const char *NAME_HALT = "HLT";
-const char *NAME_PUSH = "PSH";
-const char *NAME_PUSH_LITERAL = "PSHL";
-const char *NAME_POP = "POP";
-const char *NAME_DELAY = "DLY";
-const char *NAME_TOP = "TOP";
-const char *NAME_ADD = "ADD";
-const char *NAME_SUBTRACT = "SUB";
-const char *NAME_MULTIPLY = "MUL";
-const char *NAME_DIVIDE = "DIV";
-const char *NAME_JUMP = "JMP";
-const char *NAME_JUMP_EQUAL = "JE";
-const char *NAME_JUMP_LESS = "JL";
-const char *NAME_JUMP_GREATER = "JG";
-const char *NAME_JUMP_LESS_EQUAL = "JLE";
-const char *NAME_JUMP_GREATER_EQUAL = "JGE";
-const char *NAME_CALL = "CALL";
-const char *NAME_RET = "RET";
+int OPCODE_HALT = 0;
+int OPCODE_PUSH = 1;
+int OPCODE_PUSH_LITERAL = 2;
+int OPCODE_POP = 3;
+int OPCODE_DELAY = 4;
+int OPCODE_TOP = 5;
+int OPCODE_ADD = 6;
+int OPCODE_SUBTRACT = 7;
+int OPCODE_MULTIPLY = 8;
+int OPCODE_DIVIDE = 9;
+int OPCODE_JUMP = 10;
+int OPCODE_JUMP_EQUAL = 11;
+int OPCODE_JUMP_LESS = 12;
+int OPCODE_JUMP_GREATER = 13;
+int OPCODE_JUMP_LESS_EQUAL = 14;
+int OPCODE_JUMP_GREATER_EQUAL = 15;
+int OPCODE_CALL = 16;
+int OPCODE_RET = 17;
+char *NAME_HALT = "HLT";
+char *NAME_PUSH = "PSH";
+char *NAME_PUSH_LITERAL = "PSHL";
+char *NAME_POP = "POP";
+char *NAME_DELAY = "DLY";
+char *NAME_TOP = "TOP";
+char *NAME_ADD = "ADD";
+char *NAME_SUBTRACT = "SUB";
+char *NAME_MULTIPLY = "MUL";
+char *NAME_DIVIDE = "DIV";
+char *NAME_JUMP = "JMP";
+char *NAME_JUMP_EQUAL = "JE";
+char *NAME_JUMP_LESS = "JL";
+char *NAME_JUMP_GREATER = "JG";
+char *NAME_JUMP_LESS_EQUAL = "JLE";
+char *NAME_JUMP_GREATER_EQUAL = "JGE";
+char *NAME_CALL = "CALL";
+char *NAME_RET = "RET";
 
 void HaltInstruction_execute(Processor *processor, int operand) { exit(0); }
 
@@ -58,9 +60,14 @@ void PopInstruction_execute(Processor *processor, int address) {
   processor_set_address(processor, address, value);
 }
 
+void blink_led() {}
+
 void DelayInstruction_execute(Processor *processor, int value) {
-  int microseconds = value * 1000;
-  usleep(microseconds);
+  DDRB = DDRB | (1 << DDB5);
+  PORTB = PORTB | (1 << PORTB5);
+  _delay_ms(1000);
+  PORTB = PORTB & ~(1 << PORTB5);
+  _delay_ms(1000);
 }
 
 void TopInstruction_execute(Processor *processor, int operand) {
@@ -307,11 +314,11 @@ Instruction *create_ISA() {
   return isa;
 }
 
-int fetch(Processor *processor) {
+long int fetch(Processor *processor) {
   return processor->memory->data[processor->pc];
 }
 
-DecodedInstruction decode(int instruction) {
+DecodedInstruction decode(long int instruction) {
   DecodedInstruction decoded;
   decoded.opcode = instruction >> 16;
   decoded.operand = instruction & 0xFFFF;
@@ -326,7 +333,7 @@ void execute(Processor *processor, int opcode, int operand) {
   }
 }
 
-int processor_get_address(Processor *processor, int address) {
+long int processor_get_address(Processor *processor, int address) {
   return processor->memory->data[processor->user_memory + address];
 }
 
@@ -334,7 +341,8 @@ void processor_set_address(Processor *processor, int address, int value) {
   processor->memory->data[processor->user_memory + address] = value;
 }
 
-void run(Processor *processor, int *program, int program_size, bool debug) {
+void run(Processor *processor, long int *program, int program_size,
+         bool debug) {
   processor->memory->size = program_size;
   processor->user_memory = program_size;
   for (int i = 0; i < program_size; i++) {
@@ -346,13 +354,13 @@ void run(Processor *processor, int *program, int program_size, bool debug) {
   if (debug) {
     printf("Running instructions:\n");
     for (int i = 0; i < program_size; i++) {
-      printf("%d\n", program[i]);
+      printf("%ld\n", program[i]);
     }
     printf("Program size %d bits\n", program_size * 21);
   }
 
   while (true) {
-    int instruction = fetch(processor);
+    long int instruction = fetch(processor);
     DecodedInstruction decoded = decode(instruction);
     execute(processor, decoded.opcode, decoded.operand);
     if (decoded.opcode == OPCODE_HALT) {

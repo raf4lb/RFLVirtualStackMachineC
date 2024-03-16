@@ -15,19 +15,19 @@ typedef struct {
   int operand;
 } DecodedInstruction;
 
-DecodedInstruction decode(int instruction);
+long int fetch(Processor *processor);
 
-int processor_get_address(Processor *processor, int address);
-
-void processor_set_address(Processor *processor, int address, int value);
-
-int fetch(Processor *processor);
+DecodedInstruction decode(long int instruction);
 
 void execute(Processor *processor, int opcode, int operand);
 
 Processor *create_processor(int memory_size, int stack_size);
 
-void run(Processor *processor, int *program, int program_size, bool debug);
+long int processor_get_address(Processor *processor, int address);
+
+void processor_set_address(Processor *processor, int address, int value);
+
+void run(Processor *processor, long int *program, int program_size, bool debug);
 
 // Instruction structure
 typedef struct {

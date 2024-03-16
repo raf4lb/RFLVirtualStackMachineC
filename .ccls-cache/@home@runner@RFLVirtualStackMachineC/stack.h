@@ -1,7 +1,7 @@
 #include "memory.h"
 
 typedef struct {
-  Memory memory;
+  Memory *memory;
   int sp;
 } Stack;
 
@@ -11,4 +11,6 @@ int stack_pop(Stack *stack);
 
 int stack_get_top(Stack *stack);
 
-Stack create_stack(int size);
+void stack_pprint(Stack *stack);
+
+Stack *create_stack(int size);

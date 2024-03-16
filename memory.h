@@ -1,6 +1,6 @@
 typedef struct {
   int size;
-  int *data;
+  long int *data;
 } Memory;
 
 Memory *create_memory(int size);
