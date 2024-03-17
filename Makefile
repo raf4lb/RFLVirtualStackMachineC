@@ -24,8 +24,6 @@ arduino:
 	avr-gcc -Os -mmcu=atmega328p build/ALU.o build/memory.o build/stack.o build/delay.o build/io.o build/processor.o build/main.o -o build/main.bin
 	avr-objcopy -O ihex -R .eeprom build/main.bin build/main.hex
 
-clean-arduino:
-	rm -r build
-
 clean:
 	rm -f main main-debug
+	rm -r build

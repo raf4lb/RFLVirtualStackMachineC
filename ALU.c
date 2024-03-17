@@ -8,14 +8,14 @@ int multiply(int a, int b) { return a * b; }
 
 int divide(int a, int b) { return a / b; }
 
-int logic_and(int a, int b) { return a && b; }
+int bitwise_and(int a, int b) { return a & b; }
 
-ALU create_alu() {
-  ALU alu;
-  alu.add = add;
-  alu.subtract = subtract;
-  alu.multiply = multiply;
-  alu.divide = divide;
-  alu.logic_and = logic_and;
-  return alu;
-}
+int bitwise_or(int a, int b) { return a | b; }
+
+int bitwise_xor(int a, int b) { return a ^ b; }
+
+int bitwise_not(int a) { return ~a; }
+
+int bitwise_left_shift(int a, int b) { return a << b; }
+
+int bitwise_right_shift(int a, int b) { return a >> b; }

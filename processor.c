@@ -1,7 +1,6 @@
 #include "processor.h"
 #include "ALU.h"
 #include "delay.h"
-#include "io.h"
 #include <avr/io.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -26,6 +25,12 @@ int OPCODE_JUMP_LESS_EQUAL = 14;
 int OPCODE_JUMP_GREATER_EQUAL = 15;
 int OPCODE_CALL = 16;
 int OPCODE_RET = 17;
+int OPCODE_AND = 18;
+int OPCODE_OR = 19;
+int OPCODE_XOR = 20;
+int OPCODE_NOT = 21;
+int OPCODE_LEFT_SHIFT = 22;
+int OPCODE_RIGHT_SHIFT = 23;
 char *NAME_HALT = "HLT";
 char *NAME_PUSH = "PSH";
 char *NAME_PUSH_LITERAL = "PSHL";
@@ -44,6 +49,12 @@ char *NAME_JUMP_LESS_EQUAL = "JLE";
 char *NAME_JUMP_GREATER_EQUAL = "JGE";
 char *NAME_CALL = "CALL";
 char *NAME_RET = "RET";
+char *NAME_AND = "AND";
+char *NAME_OR = "OR";
+char *NAME_XOR = "XOR";
+char *NAME_NOT = "NOT";
+char *NAME_LEFT_SHIFT = "LSH";
+char *NAME_RIGHT_SHIFT = "RSH";
 
 void HaltInstruction_execute(Processor *processor, int operand) { exit(0); }
 
@@ -93,7 +104,7 @@ void DivideInstruction_execute(Processor *processor, int operand) {
 }
 
 void JumpInstruction_execute(Processor *processor, int address) {
-  processor_set_pc(processor, address);
+  processor->pc = address;
 }
 
 void JumpEqualInstruction_execute(Processor *processor, int address) {
@@ -133,12 +144,47 @@ void JumpGreaterEqualInstruction_execute(Processor *processor, int address) {
 
 void CallInstruction_execute(Processor *processor, int address) {
   stack_push(processor->call_stack, processor->pc);
-  processor_set_pc(processor, address);
+  processor->pc = address;
 }
 
 void ReturnInstruction_execute(Processor *processor, int operand) {
   int address = stack_pop(processor->call_stack);
   processor->pc = address;
+}
+
+void AndInstruction_execute(Processor *processor, int operand) {
+  int b = stack_pop(processor->stack);
+  int a = stack_pop(processor->stack);
+  stack_push(processor->stack, bitwise_and(a, b));
+}
+
+void OrInstruction_execute(Processor *processor, int operand) {
+  int b = stack_pop(processor->stack);
+  int a = stack_pop(processor->stack);
+  stack_push(processor->stack, bitwise_or(a, b));
+}
+
+void XorInstruction_execute(Processor *processor, int operand) {
+  int b = stack_pop(processor->stack);
+  int a = stack_pop(processor->stack);
+  stack_push(processor->stack, bitwise_xor(a, b));
+}
+
+void NotInstruction_execute(Processor *processor, int operand) {
+  int a = stack_pop(processor->stack);
+  stack_push(processor->stack, bitwise_not(a));
+}
+
+void LeftShiftInstruction_execute(Processor *processor, int operand) {
+  int b = stack_pop(processor->stack);
+  int a = stack_pop(processor->stack);
+  stack_push(processor->stack, bitwise_left_shift(a, b));
+}
+
+void RightShiftInstruction_execute(Processor *processor, int operand) {
+  int b = stack_pop(processor->stack);
+  int a = stack_pop(processor->stack);
+  stack_push(processor->stack, bitwise_right_shift(a, b));
 }
 
 Instruction create_HaltInstruction() {
@@ -285,6 +331,54 @@ Instruction create_ReturnInstruction() {
   return instruction;
 }
 
+Instruction create_AndInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_AND;
+  instruction.opcode = OPCODE_AND;
+  instruction.execute = AndInstruction_execute;
+  return instruction;
+}
+
+Instruction create_OrInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_OR;
+  instruction.opcode = OPCODE_OR;
+  instruction.execute = OrInstruction_execute;
+  return instruction;
+}
+
+Instruction create_XorInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_XOR;
+  instruction.opcode = OPCODE_XOR;
+  instruction.execute = XorInstruction_execute;
+  return instruction;
+}
+
+Instruction create_NotInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_NOT;
+  instruction.opcode = OPCODE_NOT;
+  instruction.execute = NotInstruction_execute;
+  return instruction;
+}
+
+Instruction create_LeftShiftInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_LEFT_SHIFT;
+  instruction.opcode = OPCODE_LEFT_SHIFT;
+  instruction.execute = LeftShiftInstruction_execute;
+  return instruction;
+}
+
+Instruction create_RightShiftInstruction() {
+  Instruction instruction;
+  instruction.name = NAME_RIGHT_SHIFT;
+  instruction.opcode = OPCODE_RIGHT_SHIFT;
+  instruction.execute = RightShiftInstruction_execute;
+  return instruction;
+}
+
 Instruction *create_ISA() {
   static Instruction isa[18];
   isa[OPCODE_HALT] = create_HaltInstruction();
@@ -305,21 +399,27 @@ Instruction *create_ISA() {
   isa[OPCODE_JUMP_GREATER_EQUAL] = create_JumpGreaterEqualInstruction();
   isa[OPCODE_CALL] = create_CallInstruction();
   isa[OPCODE_RET] = create_ReturnInstruction();
+  isa[OPCODE_AND] = create_AndInstruction();
+  isa[OPCODE_OR] = create_OrInstruction();
+  isa[OPCODE_XOR] = create_XorInstruction();
+  isa[OPCODE_NOT] = create_NotInstruction();
+  isa[OPCODE_LEFT_SHIFT] = create_LeftShiftInstruction();
+  isa[OPCODE_RIGHT_SHIFT] = create_RightShiftInstruction();
   return isa;
 }
 
-long int fetch(Processor *processor) {
+long int processor_fetch(Processor *processor) {
   return processor->memory->data[processor->pc];
 }
 
-DecodedInstruction decode(long int instruction) {
+DecodedInstruction processor_decode(long int instruction) {
   DecodedInstruction decoded;
   decoded.opcode = instruction >> 16;
   decoded.operand = instruction & 0xFFFF;
   return decoded;
 }
 
-void execute(Processor *processor, int opcode, int operand) {
+void processor_execute(Processor *processor, int opcode, int operand) {
   Instruction *isa = create_ISA();
   isa[opcode].execute(processor, operand);
   if (opcode != OPCODE_JUMP && opcode != OPCODE_CALL) {
@@ -332,31 +432,25 @@ long int processor_get_address(Processor *processor, int address) {
 }
 
 void processor_set_address(Processor *processor, int address, int value) {
-  int offset;
-  if (address < processor->ports_memory) {
-    offset = processor->ports_memory;
-    set_port(address, value);
+  if (address < processor->port_bank->size) {
+    *(processor->port_bank->ports[address]) = value;
   } else {
-    offset = processor->user_memory;
+    processor->memory->data[processor->user_memory + address] = value;
   }
-  processor->memory->data[offset + address] = value;
 }
 
-void processor_set_pc(Processor *processor, int address) {
-  processor->pc = processor->ports_memory + address;
-}
-
-void load_program(Processor *processor, long int *program, int program_size) {
+void processor_load_program(Processor *processor, long int *program,
+                            int program_size) {
   for (int i = 0; i < program_size; i++) {
-    processor->memory->data[processor->ports_memory + i] = program[i];
+    processor->memory->data[i] = program[i];
   }
 }
 
-void run(Processor *processor, long int *program, int program_size,
-         bool debug) {
+void processor_run(Processor *processor, long int *program, int program_size,
+                   bool debug) {
   processor->debug = debug;
-  processor->user_memory = processor->ports_memory + program_size;
-  load_program(processor, program, program_size);
+  processor->user_memory = program_size;
+  processor_load_program(processor, program, program_size);
 
   if (debug) {
     printf("Running instructions:\n");
@@ -367,16 +461,16 @@ void run(Processor *processor, long int *program, int program_size,
   }
 
   while (true) {
-    long int instruction = fetch(processor);
-    DecodedInstruction decoded = decode(instruction);
-    execute(processor, decoded.opcode, decoded.operand);
+    long int instruction = processor_fetch(processor);
+    DecodedInstruction decoded = processor_decode(instruction);
+    processor_execute(processor, decoded.opcode, decoded.operand);
     if (decoded.opcode == OPCODE_HALT) {
       break;
     }
   }
 }
 
-Processor *create_processor(int memory_size, int stack_size, int total_ports) {
+Processor *processor_create(int memory_size, int stack_size, int port_banks) {
   Processor *processor = (Processor *)malloc(sizeof(Processor));
   if (processor == NULL) {
     fprintf(stderr, "Memory allocation failed for processor\n");
@@ -396,10 +490,11 @@ Processor *create_processor(int memory_size, int stack_size, int total_ports) {
   processor->call_stack = call_stack;
   processor->debug = false; // Assuming debug is disabled by default
   processor->user_memory = 0;
-  processor->ports_memory = total_ports;
-  for (int i = 0; i < total_ports; i++) {
-    processor->memory->data[i] = 0; // Set all ports to 0
-  }
-  processor->pc = processor->ports_memory; // Initialize program counter
+
+  PortBank *port_bank = create_port_bank(port_banks); // Create port bank
+  processor->port_bank = port_bank;
+
+  processor->pc = 0; // Initialize program counter
+
   return processor;
 }

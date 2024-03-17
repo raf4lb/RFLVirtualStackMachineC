@@ -4,17 +4,19 @@ int main_processor() {
 
   int memory_size = 32;
   int stack_size = 32;
-  int total_ports = 2;
+  int total_ports = 4;
 
-  Processor *processor = create_processor(memory_size, stack_size, total_ports);
+  Processor *processor = processor_create(memory_size, stack_size, total_ports);
   // blink led
-  int program_size = 23;
-  long int program[] = {131104,  196608,  1048587, 262644, 1048590, 262644,
-                        1048593, 262644,  1048596, 262644, 655362,  131120,
-                        196609,  1114112, 131112,  196609, 1114112, 131088,
-                        196609,  1114112, 131080,  196609, 1114112};
+  int program_size = 33;
+  long int program[] = {131128,  196608,  131200,  196610,  1048606, 1048591,
+                        262644,  1048594, 262644,  1048603, 1048597, 262644,
+                        1048600, 262644,  655364,  131120,  196609,  1114112,
+                        131112,  196609,  1114112, 131088,  196609,  1114112,
+                        131080,  196609,  1114112, 131200,  196611,  1114112,
+                        131072,  196611,  1114112};
 
-  run(processor, program, program_size, false);
+  processor_run(processor, program, program_size, false);
   return 0;
 }
 
