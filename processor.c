@@ -55,6 +55,7 @@ char *NAME_XOR = "XOR";
 char *NAME_NOT = "NOT";
 char *NAME_LEFT_SHIFT = "LSH";
 char *NAME_RIGHT_SHIFT = "RSH";
+int INSTRUCTIONS = 24;
 
 void HaltInstruction_execute(Processor *processor, int operand) { exit(0); }
 
@@ -433,7 +434,7 @@ Instruction create_RightShiftInstruction()
 
 Instruction *create_ISA()
 {
-    static Instruction isa[24];
+    static Instruction isa[INSTRUCTIONS];
     isa[OPCODE_HALT] = create_HaltInstruction();
     isa[OPCODE_PUSH] = create_PushInstruction();
     isa[OPCODE_PUSH_LITERAL] = create_PushLiteralInstruction();
