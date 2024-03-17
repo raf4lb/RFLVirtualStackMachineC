@@ -1,77 +1,18 @@
-#include "ALU.h"
 #include "processor.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-int main_stack()
-{
-    Stack *stack = create_stack(10);
-
-    stack_push(stack, 5);
-    stack_push(stack, 10);
-    stack_push(stack, 15);
-
-    stack_pprint(stack);
-
-    int top = stack_get_top(stack);
-    printf("Top element: %d\n", top);
-
-    int popped = stack_pop(stack);
-    printf("Popped element: %d\n", popped);
-
-    stack_pprint(stack);
-
-    destroy_memory(stack->memory);
-
-    return 0;
-}
-
-int main_alu()
-{
-    ALU alu = create_alu();
-    // Example usage
-    int result_add = alu.add(5, 3);
-    int result_subtract = alu.subtract(5, 3);
-    int result_multiply = alu.multiply(5, 3);
-    int result_divide = alu.divide(5, 3);
-    int result_logic_and = alu.logic_and(1, 0);
-
-    printf("Addition: %d\n", result_add);
-    printf("Subtraction: %d\n", result_subtract);
-    printf("Multiplication: %d\n", result_multiply);
-    printf("Division: %d\n", result_divide);
-    printf("Logical AND: %d\n", result_logic_and);
-
-    return 0;
-}
-
-int main_isa()
-{
-    Instruction *isa = create_ISA();
-    for (int i = 0; i < 18; i++)
-    {
-        printf("%s: %d\n", isa[i].name, isa[i].opcode);
-    }
-    return 0;
-}
 
 int main_processor()
 {
-    Processor *processor = create_processor(32, 32);
+
+    int memory_size = 32;
+    int stack_size = 32;
+    int total_ports = 4;
+
+    Processor *processor = processor_create(memory_size, stack_size, total_ports);
     // blink led
-    // int program_size = 9;
-    // int program[] = {131073, 327680, 196608, 263144, 131072,
-    //                  327680, 263144, 196608, 655360};
+    int program_size = 27;
+    long int program[] = {131074, 196608, 131073, 131072, 1441792, 65537, 1179648, 196612, 131073, 720900, 1048595, 1048588, 131073, 131073, 1441792, 65537, 1245184, 196609, 655362, 131073, 131073, 1441792, 1376256, 65537, 1179648, 196609, 655362};
 
-    // for
-    int program_size = 15;
-    int program[] = {131072, 196608, 131082, 196609, 131073, 196610, 65536, 1048589, 65538, 393216, 786433, 0, 655367, 327680, 1114112};
-
-    // inc_dec
-    // int program_size = 19;
-    // int program[] = {131072, 196608, 131082, 196609, 131072, 327680, 655367, 131073, 393216, 327680, 983041, 655367, 655373, 131073, 458752, 327680, 917504, 655373, 0};
-
-    run(processor, program, program_size, false);
+    processor_run(processor, program, program_size, false);
     return 0;
 }
 

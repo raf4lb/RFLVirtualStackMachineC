@@ -4,5 +4,6 @@
 		pkgs.ccls
 		pkgs.gdb
 		pkgs.gnumake
+        pkgs.pkgsCross.avr.buildPackages.gcc
 	];
 }

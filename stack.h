@@ -1,8 +1,9 @@
 #include "memory.h"
 
-typedef struct {
-  Memory *memory;
-  int sp;
+typedef struct
+{
+    Memory *memory;
+    int sp;
 } Stack;
 
 void stack_push(Stack *stack, int value);
