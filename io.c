@@ -45,13 +45,3 @@ PortBank *create_port_bank(int size)
     map_ports(port_bank);
     return port_bank;
 }
-
-// PortBank create_port_bank(int size) {
-//   int *ports[] = {&DDRB, &PORTB};
-
-//   PortBank port_bank;
-//   port_bank.size = size;
-//   port_bank.ports = ports;
-
-//   return port_bank;
-// }

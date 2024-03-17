@@ -55,7 +55,6 @@ char *NAME_XOR = "XOR";
 char *NAME_NOT = "NOT";
 char *NAME_LEFT_SHIFT = "LSH";
 char *NAME_RIGHT_SHIFT = "RSH";
-int INSTRUCTIONS = 24;
 
 void HaltInstruction_execute(Processor *processor, int operand) { exit(0); }
 
@@ -434,7 +433,7 @@ Instruction create_RightShiftInstruction()
 
 Instruction *create_ISA()
 {
-    static Instruction isa[INSTRUCTIONS];
+    static Instruction isa[24];
     isa[OPCODE_HALT] = create_HaltInstruction();
     isa[OPCODE_PUSH] = create_PushInstruction();
     isa[OPCODE_PUSH_LITERAL] = create_PushLiteralInstruction();
@@ -487,6 +486,10 @@ void processor_execute(Processor *processor, int opcode, int operand)
 
 long int processor_get_address(Processor *processor, int address)
 {
+    if (address < processor->port_bank->size)
+    {
+        return *(processor->port_bank->ports[address]);
+    }
     return processor->memory->data[processor->user_memory + address];
 }
 

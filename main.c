@@ -9,8 +9,8 @@ int main_processor()
 
     Processor *processor = processor_create(memory_size, stack_size, total_ports);
     // blink led
-    int program_size = 23;
-    long int program[] = {131128, 196608, 1048587, 262644, 1048590, 262644, 1048593, 262644, 1048596, 262644, 655362, 131120, 196609, 1114112, 131112, 196609, 1114112, 131088, 196609, 1114112, 131080, 196609, 1114112};
+    int program_size = 27;
+    long int program[] = {131074, 196608, 131073, 131072, 1441792, 65537, 1179648, 196612, 131073, 720900, 1048595, 1048588, 131073, 131073, 1441792, 65537, 1245184, 196609, 655362, 131073, 131073, 1441792, 1376256, 65537, 1179648, 196609, 655362};
 
     processor_run(processor, program, program_size, false);
     return 0;
