@@ -1,26 +1,14 @@
 #include "io.h"
-#include "avr/io.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void set_port(int address, int value)
-{
-    switch (address)
-    {
-    case _DDRB:
-        DDRB = value;
-        break;
-    case _PORTB:
-        PORTB = value;
-        break;
-    default:
-        break;
-    }
-}
+volatile unsigned char DDRB;
+volatile unsigned char PORTB;
+volatile unsigned char DDRD;
+volatile unsigned char PORTD;
 
 void map_ports(PortBank *port_bank)
 {
-    // port_bank->ports = {&DDRB, &PORTB};
     port_bank->ports[0] = &DDRB;
     port_bank->ports[1] = &PORTB;
     port_bank->ports[2] = &DDRD;
@@ -42,6 +30,9 @@ PortBank *create_port_bank(int size)
         printf("Memory allocation failed for ports of the bank\n");
         exit(1);
     }
-    map_ports(port_bank);
+    if (size > 0)
+    {
+        map_ports(port_bank);
+    }
     return port_bank;
 }

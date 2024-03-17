@@ -1,7 +1,5 @@
 #include "processor.h"
 #include "ALU.h"
-#include "delay.h"
-#include <avr/io.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,7 +74,8 @@ void PopInstruction_execute(Processor *processor, int address)
 
 void DelayInstruction_execute(Processor *processor, int value)
 {
-    delay_ms(value);
+    int microseconds = value * 1000;
+    usleep(microseconds);
 }
 
 void TopInstruction_execute(Processor *processor, int operand)

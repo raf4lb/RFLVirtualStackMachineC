@@ -7,10 +7,15 @@ SRCS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.c' 
 HEADERS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.h' -print)
 
 main: $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) $(SRCS) -o "$@"
+	$(CC) $(CFLAGS) $(SRCS) -o build/"$@"
 
 main-debug: $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) -O0 $(SRCS) -o "$@"
+	$(CC) $(CFLAGS) -O0 $(SRCS) -o build/"$@"
+
+generic: $(SRCS) $(HEADERS)
+	mkdir build
+	$(CC) $(CFLAGS) $(SRCS) -o build/$@
+
 
 arduino:
 	mkdir build
