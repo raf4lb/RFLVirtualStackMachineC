@@ -2,19 +2,21 @@
 #include "stack.h"
 #include <stdbool.h>
 
-typedef struct {
-  Memory *memory;
-  Stack *stack;
-  Stack *call_stack;
-  int pc;
-  PortBank *port_bank;
-  int user_memory;
-  bool debug;
+typedef struct
+{
+    Memory *memory;
+    Stack *stack;
+    Stack *call_stack;
+    int pc;
+    PortBank *port_bank;
+    int user_memory;
+    bool debug;
 } Processor;
 
-typedef struct {
-  int opcode;
-  int operand;
+typedef struct
+{
+    int opcode;
+    int operand;
 } DecodedInstruction;
 
 long int processor_fetch(Processor *processor);
@@ -38,10 +40,11 @@ void processor_run(Processor *processor, long int *program, int program_size,
 Processor *processor_create(int memory_size, int stack_size, int total_ports);
 
 // Instruction structure
-typedef struct {
-  char *name;
-  int opcode;
-  void (*execute)(Processor *, int);
+typedef struct
+{
+    char *name;
+    int opcode;
+    void (*execute)(Processor *, int);
 } Instruction;
 
 // Instruction definitions

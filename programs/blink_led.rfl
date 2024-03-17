@@ -4,8 +4,8 @@
 PSHL 56 
 POP 0             ; set DDRB 5 input 6 7 output
 
-PSHL 128
-POP 2             ; set DDRD 7 output
+;PSHL 128
+;POP 2             ; set DDRD 7 output
 
 .loop
     CALL .step1
@@ -16,7 +16,7 @@ POP 2             ; set DDRD 7 output
     DLY 500      
     CALL .step4
     DLY 500
-    CALL .load_button
+    ;CALL .load_button
     JMP .loop
 
 .step1
@@ -39,9 +39,9 @@ POP 2             ; set DDRD 7 output
     POP 1         ; set PORTB 0b001000
     RET
 
-.load_button
-    ; state = (PIND & (1 << PIND7)) >> PIND7
-    ; PIND = PIND | (1 << PIND6);
-    PSHL 128
-    POP 3
-    RET
+;.load_button
+;    ; state = (PIND & (1 << PIND7)) >> PIND7
+;    ; PIND = PIND | (1 << PIND6);
+;    PSHL 128
+;    POP 3
+;    RET
