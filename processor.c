@@ -68,7 +68,7 @@ void PushLiteralInstruction_execute(Processor *processor, int value)
 
 void PopInstruction_execute(Processor *processor, int address)
 {
-    int value = stack_pop(processor->stack);
+    long int value = stack_pop(processor->stack);
     processor_set_address(processor, address, value);
 }
 
@@ -489,18 +489,20 @@ long int processor_get_address(Processor *processor, int address)
     {
         return *(processor->port_bank->ports[address]);
     }
-    return processor->memory->data[processor->user_memory + address];
+    address = processor->user_memory + address - processor->port_bank->size;
+    return processor->memory->data[address];
 }
 
-void processor_set_address(Processor *processor, int address, int value)
+void processor_set_address(Processor *processor, int address, long int value)
 {
     if (address < processor->port_bank->size)
     {
-        *(processor->port_bank->ports[address]) = value;
+        *(processor->port_bank->ports[address]) = (volatile unsigned char)value;
     }
     else
     {
-        processor->memory->data[processor->user_memory + address] = value;
+        address = processor->user_memory + address - processor->port_bank->size;
+        processor->memory->data[address] = value;
     }
 }
 
@@ -511,6 +513,18 @@ void processor_load_program(Processor *processor, long int *program,
     {
         processor->memory->data[i] = program[i];
     }
+}
+
+char *itob(int i)
+{
+    static char bits[8] = {'0', '0', '0', '0', '0', '0', '0', '0'};
+    int bits_index = 7;
+    while (i > 0)
+    {
+        bits[bits_index--] = (i & 1) + '0';
+        i = (i >> 1);
+    }
+    return bits;
 }
 
 void processor_run(Processor *processor, long int *program, int program_size,
@@ -529,12 +543,23 @@ void processor_run(Processor *processor, long int *program, int program_size,
         }
         printf("Program size %d bits\n", program_size * 21);
     }
-
+    int count = 0;
     while (true)
     {
         long int instruction = processor_fetch(processor);
         DecodedInstruction decoded = processor_decode(instruction);
         processor_execute(processor, decoded.opcode, decoded.operand);
+        volatile unsigned char ddrb = processor_get_address(processor, 0);
+        volatile unsigned char portb = processor_get_address(processor, 1);
+        long int addr_4 = processor_get_address(processor, 4);
+        printf("DDRB = %d, PORTB = %d, ADDR 4: %d\n", ddrb, portb, addr_4);
+        if (count > 100000)
+        {
+            portb = portb ^ (1 << 0);
+            processor_set_address(processor, 1, portb);
+            count = 0;
+        }
+        count++;
         if (decoded.opcode == OPCODE_HALT)
         {
             break;

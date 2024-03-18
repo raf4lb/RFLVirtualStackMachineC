@@ -13,6 +13,8 @@ void map_ports(PortBank *port_bank)
     port_bank->ports[1] = &PORTB;
     port_bank->ports[2] = &DDRD;
     port_bank->ports[3] = &PORTD;
+    // PORTB = PORTB | (1 << 0);
+    // PORTB = PORTB & ~(1 << 0);
 }
 
 PortBank *create_port_bank(int size)

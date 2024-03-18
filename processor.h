@@ -27,7 +27,7 @@ void processor_execute(Processor *processor, int opcode, int operand);
 
 long int processor_get_address(Processor *processor, int address);
 
-void processor_set_address(Processor *processor, int address, int value);
+void processor_set_address(Processor *processor, int address, long int value);
 
 void processor_set_pc(Processor *processor, int address);
 
