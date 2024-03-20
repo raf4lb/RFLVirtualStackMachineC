@@ -3,27 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void set_port(int address, int value)
-{
-    switch (address)
-    {
-    case _DDRB:
-        DDRB = value;
-        break;
-    case _PORTB:
-        PORTB = value;
-        break;
-    default:
-        break;
-    }
-}
-
 void map_ports(PortBank *port_bank)
 {
     // port_bank->ports = {&DDRB, &PORTB};
     port_bank->ports[0] = &DDRB;
     port_bank->ports[1] = &PORTB;
-    port_bank->ports[2] = &DDRD;
+    port_bank->ports[2] = &PINB;
     port_bank->ports[3] = &PORTD;
 }
 
