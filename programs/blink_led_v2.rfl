@@ -1,0 +1,34 @@
+; Use a button to control a led
+; https://wokwi.com/projects/392567753366512641
+
+; DDRB address is 0b0
+; PORTB address is 0b1
+
+PSHL 2          ; push 0b10 to stack
+POP 0           ; set DDRB 0 input 1 output
+
+.loop
+    CALL .on
+    DLY 250
+    CALL .off
+    DLY 250
+    JMP .loop   ; jump to .loop
+
+.on             ; PORTB = PORTB | (1 << PINB1)
+    PSHL 1      ; push 1 to stack
+    PSHL 1      ; push 1 to stack
+    LSH         ; bitwise LEFT SHIFT operation
+    PSH 1       ; push PORTB to stack
+    OR          ; bitwise OR operation
+    POP 1       ; pop result to address 0x1 (PORTB)
+    RET
+
+.off            ; PORTB = PORTB & ~(1 << PINB1)
+    PSHL 1      ; push 1 to stack
+    PSHL 1      ; push 1 to stack
+    LSH         ; bitwise LEFT SHIFT operation
+    NOT         ; bitwise NOT operation
+    PSH 1       ; push PORTB to stack
+    AND         ; bitwise AND operation
+    POP 1       ; pop result to address 0x1 (PORTB)
+    RET
