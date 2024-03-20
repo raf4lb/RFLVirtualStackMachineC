@@ -552,7 +552,7 @@ void processor_run(Processor *processor, long int *program, int program_size,
         volatile unsigned char ddrb = processor_get_address(processor, 0);
         volatile unsigned char portb = processor_get_address(processor, 1);
         long int addr_4 = processor_get_address(processor, 4);
-        printf("DDRB = %d, PORTB = %d, ADDR 4: %d\n", ddrb, portb, addr_4);
+        printf("DDRB = %d, PORTB = %d, ADDR 4: %ld\n", ddrb, portb, addr_4);
         if (count > 100000)
         {
             portb = portb ^ (1 << 0);

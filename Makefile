@@ -6,19 +6,23 @@ override CFLAGS += -g -Wno-everything -pthread -lm
 SRCS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.c' -print)
 HEADERS = $(shell find . -name '.ccls-cache' -type d -prune -o -type f -name '*.h' -print)
 
-main: $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) $(SRCS) -o build/"$@"
+BUILDDIR = build
 
-main-debug: $(SRCS) $(HEADERS)
-	$(CC) $(CFLAGS) -O0 $(SRCS) -o build/"$@"
-
-generic: $(SRCS) $(HEADERS)
-	mkdir build
-	$(CC) $(CFLAGS) $(SRCS) -o build/$@
-
+generic:
+	$(eval PYTHON_SCRIPT := compiler.py)
+	@echo "Compiling rfl file..."
+	$(eval OUTPUT := $(shell python $(PYTHON_SCRIPT) $(PROGRAM_FILE) $(PORTS_SIZE)))
+	@echo "OK"
+	$(eval PROGRAM := $(word 1, $(OUTPUT)))
+	$(eval PROGRAM_SIZE := $(word 2, $(OUTPUT)))
+	@echo "Program: $(PROGRAM)"
+	@echo "Size: $(PROGRAM_SIZE)"
+	mkdir -p $(BUILDDIR)
+	@echo "Sending code to RFLVM"
+	$(CC) $(SRCS) -DPROGRAM=\""$(PROGRAM)"\" -DPROGRAM_SIZE=$(PROGRAM_SIZE) -o build/$@
 
 arduino:
-	mkdir build
+	mkdir -p build
 	avr-gcc -Os -mmcu=atmega328p -c ALU.c -o build/ALU.o
 	avr-gcc -Os -mmcu=atmega328p -c memory.c -o build/memory.o
 	avr-gcc -Os -mmcu=atmega328p -c stack.c -o build/stack.o
@@ -32,3 +36,4 @@ arduino:
 clean:
 	rm -f main main-debug
 	rm -r build
+	
