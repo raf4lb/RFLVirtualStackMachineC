@@ -15,3 +15,5 @@ int stack_get_top(Stack *stack);
 void stack_pprint(Stack *stack);
 
 Stack *create_stack(int size);
+
+void stack_free(Stack *stack);

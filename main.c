@@ -57,6 +57,7 @@ int main_processor()
     Processor *processor = processor_create(memory_size, stack_size, total_ports);
     processor_run(processor, program, program_size, false);
     free(program);
+    processor_free(processor);
     return 0;
 }
 

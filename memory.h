@@ -6,4 +6,6 @@ typedef struct
 
 Memory *create_memory(int size);
 
-void destroy_memory(Memory *memory);
+void memory_pprint(Memory *memory);
+
+void memory_free(Memory *memory);
