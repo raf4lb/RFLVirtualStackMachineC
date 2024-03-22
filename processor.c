@@ -536,6 +536,7 @@ void processor_run(Processor *processor, long int *program, int program_size,
 
     while (true)
     {
+        processor_get_state(processor);
         long int instruction = processor_fetch(processor);
         DecodedInstruction decoded = processor_decode(instruction);
         processor_execute(processor, decoded.opcode, decoded.operand);
@@ -565,10 +566,30 @@ Processor *processor_create(int memory_size, int stack_size, int port_banks)
     processor->debug = false; // Assuming debug is disabled by default
     processor->user_memory = 0;
 
-    PortBank *port_bank = create_port_bank(port_banks); // Create port bank
+    PortBank *port_bank = port_bank_create(port_banks); // Create port bank
     processor->port_bank = port_bank;
 
     processor->pc = 0; // Initialize program counter
 
     return processor;
+}
+
+void processor_free(Processor *processor)
+{
+    stack_free(processor->stack);
+    stack_free(processor->call_stack);
+    port_bank_free(processor->port_bank);
+    free(processor);
+}
+
+void processor_get_state(Processor *processor)
+{
+    printf("Memory:\n");
+    memory_pprint(processor->memory);
+    printf("Stack:\n");
+    stack_pprint(processor->stack);
+    printf("Call Stack:\n");
+    stack_pprint(processor->call_stack);
+    printf("Port Bank:\n");
+    port_bank_pprint(processor->port_bank);
 }

@@ -24,4 +24,18 @@ Memory *create_memory(int size)
     return memory;
 }
 
-void destroy_memory(Memory *mem) { free(mem->data); }
+void memory_pprint(Memory *memory){
+    printf("[");
+    for (int i = 0; i < memory->size; i++)
+    {
+        if (i > 0)
+            printf(", ");
+        printf("%ld", memory->data[i]);
+    }
+    printf("]\n");
+}
+
+void memory_free(Memory *memory) { 
+    free(memory->data);
+    free(memory);
+}

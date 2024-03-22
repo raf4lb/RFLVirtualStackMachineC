@@ -9,4 +9,8 @@ typedef struct
 
 void map_ports(PortBank *port_bank);
 
-PortBank *create_port_bank(int ports);
+PortBank *port_bank_create(int ports);
+
+void port_bank_pprint(PortBank *port_bank);
+
+void port_bank_free(PortBank *port_bank);

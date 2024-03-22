@@ -53,3 +53,8 @@ Stack *create_stack(int size)
     stack->sp = 0;
     return stack;
 }
+
+void stack_free(Stack *stack){
+    memory_free(stack->memory);
+    free(stack);
+}
