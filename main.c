@@ -1,18 +1,63 @@
 #include "processor.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stddef.h>
+
+#ifndef PROGRAM
+#define PROGRAM "{}"
+#endif
+
+#ifndef PROGRAM_SIZE
+#define PROGRAM_SIZE 0
+#endif
+
+long int *convert_str_to_long_int(char str[], int size)
+{
+    long *array = malloc(size * sizeof(long)); // Dynamically allocate memory for the array
+
+    // Check if memory allocation is successful
+    if (array == NULL)
+    {
+        printf("Memory allocation failed.\n");
+        exit(1);
+    }
+
+    // Remove curly braces and split the string into individual elements
+    char *token = strtok(str, "{,}");
+    int i = 0;
+
+    // Convert each element to long integer
+    while (token != NULL)
+    {
+        array[i++] = strtol(token, NULL, 10);
+        token = strtok(NULL, "{,}");
+    }
+
+    return array;
+}
 
 int main_processor()
 {
+    char program_string[] = PROGRAM;
+    int program_size = PROGRAM_SIZE;
+    long int *program = convert_str_to_long_int(program_string, program_size);
 
     int memory_size = 32;
     int stack_size = 32;
     int total_ports = 4;
 
+    int i;
+    printf("Running program:");
+    for (i = 0; i < program_size; i++)
+    {
+        printf("%ld", program[i]);
+    }
+    printf("\n");
     Processor *processor = processor_create(memory_size, stack_size, total_ports);
-    // blink led
-    int program_size = 27;
-    long int program[] = {131074, 196608, 131073, 131072, 1441792, 65537, 1179648, 196612, 131072, 720900, 655372, 655379, 65537, 131073, 131073, 1441792, 1245184, 196609, 655362, 65537, 131073, 131073, 1441792, 1376256, 1179648, 196609, 655362};
-
     processor_run(processor, program, program_size, false);
+    free(program);
+    processor_free(processor);
     return 0;
 }
 

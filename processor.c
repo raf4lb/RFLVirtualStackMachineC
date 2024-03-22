@@ -546,20 +546,10 @@ void processor_run(Processor *processor, long int *program, int program_size,
     int count = 0;
     while (true)
     {
+        processor_get_state(processor);
         long int instruction = processor_fetch(processor);
         DecodedInstruction decoded = processor_decode(instruction);
         processor_execute(processor, decoded.opcode, decoded.operand);
-        volatile unsigned char ddrb = processor_get_address(processor, 0);
-        volatile unsigned char portb = processor_get_address(processor, 1);
-        long int addr_4 = processor_get_address(processor, 4);
-        printf("DDRB = %d, PORTB = %d, ADDR 4: %d\n", ddrb, portb, addr_4);
-        if (count > 100000)
-        {
-            portb = portb ^ (1 << 0);
-            processor_set_address(processor, 1, portb);
-            count = 0;
-        }
-        count++;
         if (decoded.opcode == OPCODE_HALT)
         {
             break;
@@ -590,10 +580,28 @@ Processor *processor_create(int memory_size, int stack_size, int port_banks)
     processor->debug = false; // Assuming debug is disabled by default
     processor->user_memory = 0;
 
-    PortBank *port_bank = create_port_bank(port_banks); // Create port bank
+    PortBank *port_bank = port_bank_create(port_banks); // Create port bank
     processor->port_bank = port_bank;
 
     processor->pc = 0; // Initialize program counter
 
     return processor;
+}
+
+void processor_free(Processor *processor){
+    stack_free(processor->stack);
+    stack_free(processor->call_stack);
+    port_bank_free(processor->port_bank);
+    free(processor);
+}
+
+void processor_get_state(Processor *processor){
+    printf("Memory:\n");
+    memory_pprint(processor->memory);
+    printf("Stack:\n");
+    stack_pprint(processor->stack);
+    printf("Call Stack:\n");
+    stack_pprint(processor->call_stack);
+    printf("Port Bank:\n");
+    port_bank_pprint(processor->port_bank);
 }

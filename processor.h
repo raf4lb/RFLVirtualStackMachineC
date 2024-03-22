@@ -39,6 +39,10 @@ void processor_run(Processor *processor, long int *program, int program_size,
 
 Processor *processor_create(int memory_size, int stack_size, int total_ports);
 
+void processor_free(Processor *processor);
+
+void processor_get_state(Processor *processor);
+
 // Instruction structure
 typedef struct
 {
