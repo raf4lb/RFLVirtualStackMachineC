@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include "serial.h"
 
 #ifndef PROGRAM
 #define PROGRAM "{}"
@@ -46,14 +47,16 @@ int main_processor()
     int memory_size = 32;
     int stack_size = 32;
     int total_ports = 4;
-
+    serial_setup();
+    serial_send("Running program\n");
     int i;
-    printf("Running program:");
     for (i = 0; i < program_size; i++)
     {
-        printf("%ld", program[i]);
+        char buffer[sizeof(long int)];
+        sprintf(buffer, "%ld\n", program[i]);
+        serial_send(buffer);
     }
-    printf("\n");
+    serial_send("\n");
     Processor *processor = processor_create(memory_size, stack_size, total_ports);
     processor_run(processor, program, program_size, false);
     free(program);
