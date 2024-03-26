@@ -48,17 +48,8 @@ int main_processor()
     int stack_size = 32;
     int total_ports = 4;
     serial_setup();
-    serial_send("Running program\n");
-    int i;
-    for (i = 0; i < program_size; i++)
-    {
-        char buffer[sizeof(long int)];
-        sprintf(buffer, "%ld\n", program[i]);
-        serial_send(buffer);
-    }
-    serial_send("\n");
     Processor *processor = processor_create(memory_size, stack_size, total_ports);
-    processor_run(processor, program, program_size, false);
+    processor_run(processor, program, program_size, true);
     free(program);
     return 0;
 }

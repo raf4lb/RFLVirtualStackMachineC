@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "serial.h"
 
 int OPCODE_HALT = 0;
 int OPCODE_PUSH = 1;
@@ -81,7 +82,7 @@ void DelayInstruction_execute(Processor *processor, int value)
 
 void TopInstruction_execute(Processor *processor, int operand)
 {
-    printf("%d\n", stack_get_top(processor->stack));
+    serial_printf("%d\n", stack_get_top(processor->stack));
 }
 
 void AddInstruction_execute(Processor *processor, int operand)
@@ -520,15 +521,15 @@ void processor_run(Processor *processor, long int *program, int program_size,
     processor->debug = debug;
     processor->user_memory = program_size;
     processor_load_program(processor, program, program_size);
-
     if (debug)
     {
-        printf("Running instructions:\n");
-        for (int i = 0; i < program_size; i++)
+        serial_printf("Running program\n");
+        int i;
+        for (i = 0; i < program_size; i++)
         {
-            printf("%ld\n", program[i]);
+            serial_printf("%ld\n", program[i]);
         }
-        printf("Program size %d bits\n", program_size * 21);
+        serial_printf("\n");
     }
 
     while (true)
@@ -536,10 +537,6 @@ void processor_run(Processor *processor, long int *program, int program_size,
         long int instruction = processor_fetch(processor);
         DecodedInstruction decoded = processor_decode(instruction);
         processor_execute(processor, decoded.opcode, decoded.operand);
-        if (decoded.opcode == OPCODE_HALT)
-        {
-            break;
-        }
     }
 }
 
