@@ -2,8 +2,15 @@
 #include "stack.h"
 #include <stdbool.h>
 
-typedef struct
+typedef struct Instruction Instruction;
+
+typedef struct Processor Processor;
+
+typedef struct DecodedInstruction DecodedInstruction;
+
+struct Processor
 {
+    Instruction *isa;
     Memory *memory;
     Stack *stack;
     Stack *call_stack;
@@ -11,13 +18,20 @@ typedef struct
     PortBank *port_bank;
     int user_memory;
     bool debug;
-} Processor;
+};
 
-typedef struct
+struct Instruction
+{
+    char *name;
+    int opcode;
+    void (*execute)(Processor *, int);
+};
+
+struct DecodedInstruction
 {
     int opcode;
     int operand;
-} DecodedInstruction;
+};
 
 long int processor_fetch(Processor *processor);
 
@@ -42,14 +56,6 @@ Processor *processor_create(int memory_size, int stack_size, int total_ports);
 void processor_free(Processor *processor);
 
 void processor_get_state(Processor *processor);
-
-// Instruction structure
-typedef struct
-{
-    char *name;
-    int opcode;
-    void (*execute)(Processor *, int);
-} Instruction;
 
 // Instruction definitions
 void HaltInstruction_execute(Processor *, int);
@@ -100,5 +106,7 @@ Instruction create_XorInstruction();
 Instruction create_NotInstruction();
 Instruction create_LeftShiftInstruction();
 Instruction create_RightShiftInstruction();
+
+#define TOTAL_INSTRUCTIONS 24
 
 Instruction *create_ISA();

@@ -436,7 +436,12 @@ Instruction create_RightShiftInstruction()
 
 Instruction *create_ISA()
 {
-    static Instruction isa[24];
+    Instruction *isa = (Instruction *)malloc(TOTAL_INSTRUCTIONS * sizeof(Instruction));
+    if (isa == NULL)
+    {
+        serial_printf("Memory allocation failed for isa\n");
+        exit(1);
+    }
     isa[OPCODE_HALT] = create_HaltInstruction();
     isa[OPCODE_PUSH] = create_PushInstruction();
     isa[OPCODE_PUSH_LITERAL] = create_PushLiteralInstruction();
@@ -479,8 +484,7 @@ DecodedInstruction processor_decode(long int instruction)
 
 void processor_execute(Processor *processor, int opcode, int operand)
 {
-    Instruction *isa = create_ISA();
-    isa[opcode].execute(processor, operand);
+    processor->isa[opcode].execute(processor, operand);
     if (opcode != OPCODE_JUMP && opcode != OPCODE_CALL)
     {
         processor->pc++;
@@ -554,6 +558,10 @@ Processor *processor_create(int memory_size, int stack_size, int port_banks)
         serial_printf("Memory allocation failed for processor\n");
         exit(1);
     }
+
+    // Create processor ISA
+    Instruction *isa = create_ISA();
+    processor->isa = isa;
 
     // Allocate memory for memory structure and initialize its data
     Memory *memory = create_memory(memory_size);
