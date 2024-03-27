@@ -4,12 +4,22 @@
 
 void stack_push(Stack *stack, int value)
 {
+    if (stack->sp == stack->memory->size)
+    {
+        serial_printf("ERROR: STACKOVERFLOW");
+        exit(1);
+    }
     stack->memory->data[stack->sp] = value;
     stack->sp++;
 }
 
 int stack_pop(Stack *stack)
 {
+    if (stack->sp == 0)
+    {
+        serial_printf("ERROR: STACKUNDERFLOW");
+        exit(1);
+    }
     stack->sp--;
     return stack->memory->data[stack->sp];
 }

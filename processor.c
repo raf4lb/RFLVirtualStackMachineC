@@ -58,9 +58,7 @@ char *NAME_RIGHT_SHIFT = "RSH";
 
 void HaltInstruction_execute(Processor *processor, int operand)
 {
-    while (true)
-    {
-    };
+    exit(0);
 }
 
 void PushInstruction_execute(Processor *processor, int address)

@@ -4,6 +4,7 @@
 ; DDRB address is 0b0
 ; PORTB address is 0b1
 
+VAR result
 PSHL 2          ; push 0b10 to stack
 POP 0           ; set DDRB 0 input 1 output
 
@@ -13,13 +14,14 @@ POP 0           ; set DDRB 0 input 1 output
     LSH         ; bitwise LEFT SHIFT operation
     PSH 2       ; push PINB to stack
     AND         ; bitwise AND operation
-    POP 4
-    PSHL 0
-    JE 4       ; jump if top stack (PORTB0) equals 0b00 (if its high)
+    POP $result
+    PSHL 1
+    JE $result       ; jump if top stack (PORTB0) equals 0b00 (if its high)
     JMP .on    ; call on routine
     JMP .off   ; call off routine
 
 .on             ; PORTB = PORTB | (1 << PINB1)
+    POP $result
     PSH 1       ; push PORTB to stack
     PSHL 1      ; push 1 to stack
     PSHL 1      ; push 1 to stack
@@ -29,6 +31,7 @@ POP 0           ; set DDRB 0 input 1 output
     JMP .loop
 
 .off            ; PORTB = PORTB & ~(1 << PINB1)
+    POP $result
     PSH 1       ; push PORTB to stack
     PSHL 1      ; push 1 to stack
     PSHL 1      ; push 1 to stack
