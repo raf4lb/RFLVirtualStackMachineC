@@ -24,18 +24,20 @@ Memory *create_memory(int size)
     return memory;
 }
 
-void memory_pprint(Memory *memory){
-    printf("[");
+void memory_pprint(Memory *memory)
+{
+    serial_printf("[");
     for (int i = 0; i < memory->size; i++)
     {
         if (i > 0)
-            printf(", ");
-        printf("%ld", memory->data[i]);
+            serial_printf(", ");
+        serial_printf("%ld", memory->data[i]);
     }
-    printf("]\n");
+    serial_printf("]\n");
 }
 
-void memory_free(Memory *memory) { 
+void memory_free(Memory *memory)
+{
     free(memory->data);
     free(memory);
 }

@@ -536,7 +536,10 @@ void processor_run(Processor *processor, long int *program, int program_size,
 
     while (true)
     {
-        processor_get_state(processor);
+        if (debug)
+        {
+            processor_get_state(processor);
+        }
         long int instruction = processor_fetch(processor);
         DecodedInstruction decoded = processor_decode(instruction);
         processor_execute(processor, decoded.opcode, decoded.operand);
@@ -584,12 +587,12 @@ void processor_free(Processor *processor)
 
 void processor_get_state(Processor *processor)
 {
-    printf("Memory:\n");
+    serial_printf("Memory:\n");
     memory_pprint(processor->memory);
-    printf("Stack:\n");
+    serial_printf("Stack:\n");
     stack_pprint(processor->stack);
-    printf("Call Stack:\n");
+    serial_printf("Call Stack:\n");
     stack_pprint(processor->call_stack);
-    printf("Port Bank:\n");
+    serial_printf("Port Bank:\n");
     port_bank_pprint(processor->port_bank);
 }

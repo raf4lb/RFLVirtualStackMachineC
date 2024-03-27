@@ -32,18 +32,20 @@ PortBank *port_bank_create(int size)
     return port_bank;
 }
 
-void port_bank_pprint(PortBank *port_bank){
-    printf("[");
+void port_bank_pprint(PortBank *port_bank)
+{
+    serial_printf("[");
     for (int i = 0; i < port_bank->size; i++)
     {
         if (i > 0)
-            printf(", ");
-        printf("%hhu", *(port_bank->ports[i]));
+            serial_printf(", ");
+        serial_printf("%hhu", *(port_bank->ports[i]));
     }
-    printf("]\n");
+    serial_printf("]\n");
 }
 
-void port_bank_free(PortBank *port_bank){
+void port_bank_free(PortBank *port_bank)
+{
     free(port_bank->ports);
     free(port_bank);
 }
