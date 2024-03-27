@@ -2,6 +2,7 @@
 #include "avr/io.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "serial.h"
 
 void map_ports(PortBank *port_bank)
 {
@@ -17,14 +18,14 @@ PortBank *create_port_bank(int size)
     PortBank *port_bank = (PortBank *)malloc(sizeof(PortBank));
     if (port_bank == NULL)
     {
-        fprintf(stderr, "Memory allocation failed for port bank\n");
+        serial_printf("Memory allocation failed for port bank\n");
         exit(1);
     }
     port_bank->size = size;
     port_bank->ports = (volatile unsigned char **)malloc(size * sizeof(volatile unsigned char *));
     if (port_bank->ports == NULL)
     {
-        printf("Memory allocation failed for ports of the bank\n");
+        serial_printf("Memory allocation failed for ports of the bank\n");
         exit(1);
     }
     map_ports(port_bank);

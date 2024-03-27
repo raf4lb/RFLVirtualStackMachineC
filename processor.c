@@ -3,7 +3,6 @@
 #include "delay.h"
 #include <avr/io.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "serial.h"
@@ -57,7 +56,12 @@ char *NAME_NOT = "NOT";
 char *NAME_LEFT_SHIFT = "LSH";
 char *NAME_RIGHT_SHIFT = "RSH";
 
-void HaltInstruction_execute(Processor *processor, int operand) { exit(0); }
+void HaltInstruction_execute(Processor *processor, int operand)
+{
+    while (true)
+    {
+    };
+}
 
 void PushInstruction_execute(Processor *processor, int address)
 {
@@ -545,7 +549,7 @@ Processor *processor_create(int memory_size, int stack_size, int port_banks)
     Processor *processor = (Processor *)malloc(sizeof(Processor));
     if (processor == NULL)
     {
-        fprintf(stderr, "Memory allocation failed for processor\n");
+        serial_printf("Memory allocation failed for processor\n");
         exit(1);
     }
 

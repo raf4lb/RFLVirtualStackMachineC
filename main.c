@@ -1,8 +1,6 @@
 #include "processor.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <stddef.h>
 #include "serial.h"
 
 #ifndef PROGRAM
@@ -20,7 +18,7 @@ long int *convert_str_to_long_int(char str[], int size)
     // Check if memory allocation is successful
     if (array == NULL)
     {
-        printf("Memory allocation failed.\n");
+        serial_printf("Memory allocation failed.\n");
         exit(1);
     }
 
@@ -48,9 +46,11 @@ int main_processor()
     int stack_size = 32;
     int total_ports = 4;
     serial_setup();
+    serial_printf("starting vm\n");
     Processor *processor = processor_create(memory_size, stack_size, total_ports);
-    processor_run(processor, program, program_size, true);
+    processor_run(processor, program, program_size, false);
     free(program);
+    serial_printf("ending vm\n");
     return 0;
 }
 

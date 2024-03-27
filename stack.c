@@ -1,6 +1,6 @@
 #include "stack.h"
-#include <stdio.h>
 #include <stdlib.h>
+#include "serial.h"
 
 void stack_push(Stack *stack, int value)
 {
@@ -16,17 +16,17 @@ int stack_pop(Stack *stack)
 
 void stack_pprint(Stack *stack)
 {
-    printf("[");
+    serial_printf("[");
     for (int i = 0; i < stack->memory->size; i++)
     {
         if (i > 0)
-            printf(", ");
+            serial_printf(", ");
         if (i == stack->sp - 1)
-            printf("->%ld", stack->memory->data[i]);
+            serial_printf("->%ld", stack->memory->data[i]);
         else
-            printf("%ld", stack->memory->data[i]);
+            serial_printf("%ld", stack->memory->data[i]);
     }
-    printf("]\n");
+    serial_printf("]\n");
 }
 
 int stack_get_top(Stack *stack) { return stack->memory->data[stack->sp - 1]; }
@@ -36,7 +36,7 @@ Stack *create_stack(int size)
     Stack *stack = (Stack *)malloc(sizeof(Stack));
     if (stack == NULL)
     {
-        fprintf(stderr, "Memory allocation failed for stack\n");
+        serial_printf("Memory allocation failed for stack\n");
         exit(1);
     }
     stack->memory = create_memory(size);

@@ -3,9 +3,8 @@
 
 void delay_ms(int milliseconds)
 {
-    while (milliseconds > 0)
+    while (milliseconds--)
     {
         _delay_ms(1); // Delay 1 millisecond using built-in _delay_ms function
-        milliseconds--;
     }
 }
