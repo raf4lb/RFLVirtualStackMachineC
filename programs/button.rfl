@@ -14,9 +14,7 @@ POP 0           ; set DDRB 0 input 1 output
     LSH         ; bitwise LEFT SHIFT operation
     PSH 2       ; push PINB to stack
     AND         ; bitwise AND operation
-    POP $result
-    PSHL 1
-    JE $result       ; jump if top stack (PORTB0) equals 0b00 (if its high)
+    JEL 0       ; jump if top stack (PORTB0) equals 0b00 (if its low)
     JMP .on    ; call on routine
     JMP .off   ; call off routine
 

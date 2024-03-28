@@ -82,6 +82,11 @@ void XorInstruction_execute(Processor *, int);
 void NotInstruction_execute(Processor *, int);
 void LeftShiftInstruction_execute(Processor *, int);
 void RightShiftInstruction_execute(Processor *, int);
+void JumpEqualLiteralInstruction_execute(Processor *, int);
+void JumpLessLiteralInstruction_execute(Processor *, int);
+void JumpGreaterLiteralInstruction_execute(Processor *, int);
+void JumpLessEqualLiteralInstruction_execute(Processor *, int);
+void JumpGreaterEqualLiteralInstruction_execute(Processor *, int);
 
 Instruction create_HaltInstruction();
 Instruction create_PushInstruction();
@@ -106,7 +111,12 @@ Instruction create_XorInstruction();
 Instruction create_NotInstruction();
 Instruction create_LeftShiftInstruction();
 Instruction create_RightShiftInstruction();
+Instruction create_JumpEqualLiteralInstruction();
+Instruction create_JumpLessLiteralInstruction();
+Instruction create_JumpGreaterLiteralInstruction();
+Instruction create_JumpLessEqualLiteralInstruction();
+Instruction create_JumpGreaterEqualLiteralInstruction();
 
-#define TOTAL_INSTRUCTIONS 24
+#define TOTAL_INSTRUCTIONS 29
 
 Instruction *create_ISA();

@@ -10,7 +10,7 @@ void stack_push(Stack *stack, int value);
 
 int stack_pop(Stack *stack);
 
-int stack_get_top(Stack *stack);
+long int stack_get_top(Stack *stack);
 
 void stack_pprint(Stack *stack);
 

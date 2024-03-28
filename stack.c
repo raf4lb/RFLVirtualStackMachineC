@@ -39,7 +39,7 @@ void stack_pprint(Stack *stack)
     serial_printf("]\n");
 }
 
-int stack_get_top(Stack *stack) { return stack->memory->data[stack->sp - 1]; }
+long int stack_get_top(Stack *stack) { return stack->memory->data[stack->sp - 1]; }
 
 Stack *create_stack(int size)
 {
@@ -54,7 +54,8 @@ Stack *create_stack(int size)
     return stack;
 }
 
-void stack_free(Stack *stack){
+void stack_free(Stack *stack)
+{
     memory_free(stack->memory);
     free(stack);
 }

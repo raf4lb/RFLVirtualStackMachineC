@@ -25,6 +25,11 @@ INSTRUCTIONS = {
     "NOT": 21,
     "LSH": 22,
     "RSH": 23,
+    "JEL": 24,
+    "JLL": 25,
+    "JGL": 26,
+    "JLEL": 27,
+    "JGEL": 28,
 }
 
 

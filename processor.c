@@ -31,6 +31,12 @@ int OPCODE_XOR = 20;
 int OPCODE_NOT = 21;
 int OPCODE_LEFT_SHIFT = 22;
 int OPCODE_RIGHT_SHIFT = 23;
+int OPCODE_JUMP_EQUAL_LITERAL = 24;
+int OPCODE_JUMP_LESS_LITERAL = 25;
+int OPCODE_JUMP_GREATER_LITERAL = 26;
+int OPCODE_JUMP_LESS_EQUAL_LITERAL = 27;
+int OPCODE_JUMP_GREATER_EQUAL_LITERAL = 28;
+
 char *NAME_HALT = "HLT";
 char *NAME_PUSH = "PSH";
 char *NAME_PUSH_LITERAL = "PSHL";
@@ -55,6 +61,11 @@ char *NAME_XOR = "XOR";
 char *NAME_NOT = "NOT";
 char *NAME_LEFT_SHIFT = "LSH";
 char *NAME_RIGHT_SHIFT = "RSH";
+char *NAME_JUMP_EQUAL_LITERAL = "JEL";
+char *NAME_JUMP_LESS_LITERAL = "JLL";
+char *NAME_JUMP_GREATER_LITERAL = "JGL";
+char *NAME_JUMP_LESS_EQUAL_LITERAL = "JLEL";
+char *NAME_JUMP_GREATER_EQUAL_LITERAL = "JGEL";
 
 void HaltInstruction_execute(Processor *processor, int operand)
 {
@@ -84,7 +95,7 @@ void DelayInstruction_execute(Processor *processor, int value)
 
 void TopInstruction_execute(Processor *processor, int operand)
 {
-    serial_printf("%d\n", stack_get_top(processor->stack));
+    serial_printf("%ld\n", stack_get_top(processor->stack));
 }
 
 void AddInstruction_execute(Processor *processor, int operand)
@@ -122,8 +133,7 @@ void JumpInstruction_execute(Processor *processor, int address)
 
 void JumpEqualInstruction_execute(Processor *processor, int address)
 {
-    if (stack_get_top(processor->stack) ==
-        processor_get_address(processor, address))
+    if (stack_get_top(processor->stack) == processor_get_address(processor, address))
     {
         processor->pc++;
     }
@@ -131,8 +141,7 @@ void JumpEqualInstruction_execute(Processor *processor, int address)
 
 void JumpLessInstruction_execute(Processor *processor, int address)
 {
-    if (stack_get_top(processor->stack) <
-        processor_get_address(processor, address))
+    if (stack_get_top(processor->stack) < processor_get_address(processor, address))
     {
         processor->pc++;
     }
@@ -140,8 +149,7 @@ void JumpLessInstruction_execute(Processor *processor, int address)
 
 void JumpGreaterInstruction_execute(Processor *processor, int address)
 {
-    if (stack_get_top(processor->stack) >
-        processor_get_address(processor, address))
+    if (stack_get_top(processor->stack) > processor_get_address(processor, address))
     {
         processor->pc++;
     }
@@ -149,8 +157,7 @@ void JumpGreaterInstruction_execute(Processor *processor, int address)
 
 void JumpLessEqualInstruction_execute(Processor *processor, int address)
 {
-    if (stack_get_top(processor->stack) <=
-        processor_get_address(processor, address))
+    if (stack_get_top(processor->stack) <= processor_get_address(processor, address))
     {
         processor->pc++;
     }
@@ -158,8 +165,7 @@ void JumpLessEqualInstruction_execute(Processor *processor, int address)
 
 void JumpGreaterEqualInstruction_execute(Processor *processor, int address)
 {
-    if (stack_get_top(processor->stack) >=
-        processor_get_address(processor, address))
+    if (stack_get_top(processor->stack) >= processor_get_address(processor, address))
     {
         processor->pc++;
     }
@@ -216,6 +222,46 @@ void RightShiftInstruction_execute(Processor *processor, int operand)
     int b = stack_pop(processor->stack);
     int a = stack_pop(processor->stack);
     stack_push(processor->stack, bitwise_right_shift(a, b));
+}
+
+void JumpEqualLiteralInstruction_execute(Processor *processor, int value)
+{
+    if (stack_get_top(processor->stack) == value)
+    {
+        processor->pc++;
+    }
+}
+
+void JumpLessLiteralInstruction_execute(Processor *processor, int value)
+{
+    if (stack_get_top(processor->stack) < value)
+    {
+        processor->pc++;
+    }
+}
+
+void JumpGreaterLiteralInstruction_execute(Processor *processor, int value)
+{
+    if (stack_get_top(processor->stack) > value)
+    {
+        processor->pc++;
+    }
+}
+
+void JumpLessEqualLiteralInstruction_execute(Processor *processor, int value)
+{
+    if (stack_get_top(processor->stack) <= value)
+    {
+        processor->pc++;
+    }
+}
+
+void JumpGreaterEqualLiteralInstruction_execute(Processor *processor, int value)
+{
+    if (stack_get_top(processor->stack) >= value)
+    {
+        processor->pc++;
+    }
 }
 
 Instruction create_HaltInstruction()
@@ -434,6 +480,51 @@ Instruction create_RightShiftInstruction()
     return instruction;
 }
 
+Instruction create_JumpEqualLiteralInstruction()
+{
+    Instruction instruction;
+    instruction.name = NAME_JUMP_EQUAL_LITERAL;
+    instruction.opcode = OPCODE_JUMP_EQUAL_LITERAL;
+    instruction.execute = JumpEqualLiteralInstruction_execute;
+    return instruction;
+}
+
+Instruction create_JumpLessLiteralInstruction()
+{
+    Instruction instruction;
+    instruction.name = NAME_JUMP_LESS_LITERAL;
+    instruction.opcode = OPCODE_JUMP_LESS_LITERAL;
+    instruction.execute = JumpLessLiteralInstruction_execute;
+    return instruction;
+}
+
+Instruction create_JumpGreaterLiteralInstruction()
+{
+    Instruction instruction;
+    instruction.name = NAME_JUMP_GREATER_LITERAL;
+    instruction.opcode = OPCODE_JUMP_GREATER_LITERAL;
+    instruction.execute = JumpGreaterLiteralInstruction_execute;
+    return instruction;
+}
+
+Instruction create_JumpLessEqualLiteralInstruction()
+{
+    Instruction instruction;
+    instruction.name = NAME_JUMP_LESS_EQUAL_LITERAL;
+    instruction.opcode = OPCODE_JUMP_LESS_EQUAL_LITERAL;
+    instruction.execute = JumpLessEqualLiteralInstruction_execute;
+    return instruction;
+}
+
+Instruction create_JumpGreaterEqualLiteralInstruction()
+{
+    Instruction instruction;
+    instruction.name = NAME_JUMP_GREATER_EQUAL_LITERAL;
+    instruction.opcode = OPCODE_JUMP_GREATER_EQUAL_LITERAL;
+    instruction.execute = JumpGreaterEqualLiteralInstruction_execute;
+    return instruction;
+}
+
 Instruction *create_ISA()
 {
     Instruction *isa = (Instruction *)malloc(TOTAL_INSTRUCTIONS * sizeof(Instruction));
@@ -466,6 +557,12 @@ Instruction *create_ISA()
     isa[OPCODE_NOT] = create_NotInstruction();
     isa[OPCODE_LEFT_SHIFT] = create_LeftShiftInstruction();
     isa[OPCODE_RIGHT_SHIFT] = create_RightShiftInstruction();
+    isa[OPCODE_JUMP_EQUAL_LITERAL] = create_JumpEqualLiteralInstruction();
+    isa[OPCODE_JUMP_LESS_LITERAL] = create_JumpLessLiteralInstruction();
+    isa[OPCODE_JUMP_GREATER_LITERAL] = create_JumpGreaterLiteralInstruction();
+    isa[OPCODE_JUMP_LESS_EQUAL_LITERAL] = create_JumpLessEqualLiteralInstruction();
+    isa[OPCODE_JUMP_GREATER_EQUAL_LITERAL] = create_JumpGreaterEqualLiteralInstruction();
+
     return isa;
 }
 
